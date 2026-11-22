@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -983,7 +983,8 @@
             { id: "master2", name: "সহ-মাস্টার অ্যাডমিন", phone: "01744432350", pin: "12345", role: "super", union: "ALL" }
         ];
 
-        const IMGBB_API_KEY = "a92a1ff4a0aa498fd2f3ef937cf40e6e";
+        const IMGBB_API_KEY = "83d9e310c0816f055a8d15e6bf44a1f2";
+        const IMGBB_FALLBACK_KEY = "a92a1ff4a0aa498fd2f3ef937cf40e6e";
 
         // Firebase Configuration (IJAB Bakerganj)
         const LIVE_FIREBASE_CONFIG = {
@@ -999,6 +1000,8 @@
         let db = null, auth = null, appId = 'ijab-bakerganj';
         let isFirebaseReady = false;
 
+        let newDbPeople = [];
+        let legacyDbPeople = [];
         let peopleData = [...UPAZILA_LEADERS_PRESET];
         let financeData = [];
         let attendanceData = [];
@@ -1013,6 +1016,116 @@
         function toEnglishDigits(str) {
             const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
             return String(str || '').replace(/[০-৯]/g, d => bn.indexOf(d));
+        }
+
+        // পুরোনো অ্যাপের ইউনিয়নের নামকে নতুন নামের সাথে মেলানো
+        function normalizeUnionName(u) {
+            const raw = String(u || '').trim();
+            const map = {
+                "বাকেরগঞ্জ উপজেলা শাখা": "বাকেরগঞ্জ উপজেলা শাখা",
+                "পৌর শাখা": "বাকেরগঞ্জ পৌরসভা",
+                "পৌরসভা": "বাকেরগঞ্জ পৌরসভা",
+                "গারুড়িয়া": "গারুড়িয়া ইউনিয়ন",
+                "গারুরিয়া": "গারুড়িয়া ইউনিয়ন",
+                "কলসকাঠী": "কলসকাঠি ইউনিয়ন",
+                "কলসকাঠি": "কলসকাঠি ইউনিয়ন",
+                "নলুয়া": "নলুয়া ইউনিয়ন",
+                "ভরপাশা": "ভরপাশা ইউনিয়ন",
+                "পাদ্রীশিবপুর": "পাদ্রীশিবপুর ইউনিয়ন",
+                "রঙ্গশ্রী": "রঙ্গশ্রী ইউনিয়ন",
+                "নিয়ামতি": "নিয়ামতি ইউনিয়ন",
+                "বোয়ালিয়া সাংগঠনিক শাখা": "বোয়ালিয়া সাংগঠনিক ইউনিয়ন",
+                "বোয়ালিয়া সাংগঠনিক": "বোয়ালিয়া সাংগঠনিক ইউনিয়ন"
+            };
+            return map[raw] || raw || "বাকেরগঞ্জ উপজেলা শাখা";
+        }
+
+        // মোবাইল নম্বর ১১ ডিজিটে নরমালাইজ করা
+        function cleanPhone11(phone) {
+            return toEnglishDigits(phone || '').replace(/[^0-9]/g, '').slice(-11);
+        }
+
+        // নতুন ও পুরোনো ফায়ারবেস কালেকশন এবং প্রিসেট তালিকা একত্রে মার্জ করা
+        function mergeAllPeopleData() {
+            const legacyByPhone = new Map();
+            const legacyByName = new Map();
+            legacyDbPeople.forEach(lp => {
+                const ph = cleanPhone11(lp.phone);
+                if (ph) legacyByPhone.set(ph, lp);
+                const nm = String(lp.name || '').trim();
+                if (nm) legacyByName.set(nm, lp);
+            });
+
+            const getPhoto = (obj) => (obj && (obj.photo || obj.photoUrl || obj.image || obj.imageUrl)) || '';
+
+            const merged = [];
+            const seenPhones = new Set();
+            const seenIds = new Set();
+
+            // ১. নতুন কালেকশনের (ijab_people) ডেটা আগে নেওয়া, ছবি না থাকলে পুরোনোটা থেকে নেওয়া
+            newDbPeople.forEach(p => {
+                const ph = cleanPhone11(p.phone);
+                const nm = String(p.name || '').trim();
+                const legacyMatch = (ph && legacyByPhone.get(ph)) || (nm && legacyByName.get(nm)) || null;
+                const resolvedPhoto = getPhoto(p) || getPhoto(legacyMatch);
+                merged.push({
+                    ...p,
+                    union: normalizeUnionName(p.union),
+                    photo: resolvedPhoto,
+                    _inNewDb: true,
+                    _legacyId: legacyMatch ? legacyMatch.id : (p._legacyId || null)
+                });
+                if (ph) seenPhones.add(ph);
+                if (p.id) seenIds.add(p.id);
+            });
+
+            // ২. পুরোনো কালেকশনের (members) ডেটা ও ছবি যুক্ত করা
+            legacyDbPeople.forEach(lp => {
+                const ph = cleanPhone11(lp.phone);
+                if (ph && seenPhones.has(ph)) return;
+
+                const nm = String(lp.name || '').trim();
+                const presetMatch = UPAZILA_LEADERS_PRESET.find(pr =>
+                    (ph && cleanPhone11(pr.phone) === ph) || (nm && pr.name.trim() === nm)
+                );
+                const resolvedType = lp.type || (lp.designation === 'সদস্য' ? 'member' : 'leader');
+                const resolvedPhoto = getPhoto(lp);
+
+                merged.push({
+                    id: presetMatch ? presetMatch.id : lp.id,
+                    type: presetMatch ? presetMatch.type : resolvedType,
+                    name: lp.name || (presetMatch ? presetMatch.name : ''),
+                    designation: lp.designation || (presetMatch ? presetMatch.designation : ''),
+                    union: normalizeUnionName(lp.union || (presetMatch ? presetMatch.union : '')),
+                    phone: lp.phone || (presetMatch ? presetMatch.phone : ''),
+                    bloodGroup: lp.bloodGroup || '',
+                    fixedIyanat: Number(lp.fixedIyanat || 0),
+                    photo: resolvedPhoto,
+                    _inNewDb: false,
+                    _legacyId: lp.id
+                });
+                if (ph) seenPhones.add(ph);
+                if (presetMatch) seenIds.add(presetMatch.id);
+                seenIds.add(lp.id);
+            });
+
+            // ৩. অবশিষ্ট উপজেলা প্রিসেট দায়িত্বশীলদের যুক্ত করা
+            UPAZILA_LEADERS_PRESET.forEach(pr => {
+                const ph = cleanPhone11(pr.phone);
+                if (!seenIds.has(pr.id) && (!ph || !seenPhones.has(ph))) {
+                    merged.push({ ...pr, _inNewDb: false, _legacyId: null });
+                }
+            });
+
+            peopleData = merged;
+            updateDashboardStats();
+            renderPublicDashboard();
+            renderPeopleList();
+            if (currentTab === 'attendance') loadAttendanceChecklist();
+            if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
+                const updated = peopleData.find(p => p.id === selectedPersonForModal.id);
+                if (updated) openPersonDetail(updated.id);
+            }
         }
 
         // --- INITIALIZE UI & DROPDOWNS ---
@@ -1070,20 +1183,19 @@
         // --- FIREBASE SYSTEM INITIALIZATION ---
         async function initializeAppSystem() {
             try {
-                const activeConfig = (typeof __firebase_config !== 'undefined' && __firebase_config)
-                    ? JSON.parse(__firebase_config)
-                    : LIVE_FIREBASE_CONFIG;
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'ijab-bakerganj';
-
-                const app = initializeApp(activeConfig);
+                // সবসময় আপনার আসল লাইভ ফায়ারবেস (ijab-bakerganj) ব্যবহার করা হবে
+                appId = 'ijab-bakerganj';
+                const app = initializeApp(LIVE_FIREBASE_CONFIG);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
+                // অ্যানোনিমাস লগইন ব্যর্থ হলেও যেন ডেটা ও ছবি লোড হওয়া আটকে না যায়
+                try {
                     await signInAnonymously(auth);
+                } catch (authErr) {
+                    console.warn("Anonymous auth skipped:", authErr);
                 }
+
                 isFirebaseReady = true;
                 setupRealtimeListeners();
             } catch (error) {
@@ -1107,28 +1219,28 @@
         function setupRealtimeListeners() {
             if (!isFirebaseReady || !db) return;
 
-            // ১. দায়িত্বশীল, সদস্য ও সুধী লিসেনার
+            // ১. নতুন কালেকশন (ijab_people) লিসেনার
             const peopleCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people');
             onSnapshot(peopleCol, (snapshot) => {
                 document.getElementById('loading-spinner').classList.add('hidden');
-                const dbPeople = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                const dbIds = new Set(dbPeople.map(p => p.id));
-                const dbPhones = new Set(dbPeople.map(p => (p.phone || '').replace(/[^0-9]/g, '').slice(-11)));
-                const remainingPresets = UPAZILA_LEADERS_PRESET.filter(
-                    p => !dbIds.has(p.id) && !dbPhones.has((p.phone || '').replace(/[^0-9]/g, '').slice(-11))
-                );
-                peopleData = [...dbPeople, ...remainingPresets];
-                updateDashboardStats();
-                renderPublicDashboard();
-                renderPeopleList();
-                if (currentTab === 'attendance') loadAttendanceChecklist();
-                if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
-                    const updated = peopleData.find(p => p.id === selectedPersonForModal.id);
-                    if (updated) openPersonDetail(updated.id);
-                }
+                newDbPeople = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                mergeAllPeopleData();
             }, (err) => {
                 console.error("People snapshot error:", err);
                 loadDemoData();
+            });
+
+            // ১খ. পুরোনো কালেকশন (members) লিসেনার — আগে আপলোড করা সব ছবি ও সদস্য ফিরিয়ে আনতে
+            const legacyPeopleCol = collection(db, 'members');
+            onSnapshot(legacyPeopleCol, (snapshot) => {
+                document.getElementById('loading-spinner').classList.add('hidden');
+                legacyDbPeople = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                mergeAllPeopleData();
+            }, (err) => {
+                console.warn("Legacy members snapshot warning:", err);
+                if (err && err.code === 'permission-denied') {
+                    showToast('ফায়ারবেস ডেটাবেস পারমিশন (Rules) বন্ধ আছে—ছবি ও ডেটা আনতে রুলস চেক করুন।', 'error');
+                }
             });
 
             // ২. বায়তুলমাল (আয়-ব্যয়) লিসেনার
@@ -1142,17 +1254,17 @@
                 if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
                     renderPersonIyanatGrid(selectedPersonForModal);
                 }
-            }, (err) => console.error("Finance snapshot error:", err));
+            }, (err) => console.warn("Finance snapshot error:", err));
 
             // ৩. প্রোগ্রাম হাজিরা লিসেনার
-            const attCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_attendance');
-            onSnapshot(attCol, (snapshot) => {
+            const attendanceCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_attendance');
+            onSnapshot(attendanceCol, (snapshot) => {
                 attendanceData = snapshot.docs
                     .map(d => ({ id: d.id, ...d.data() }))
-                    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+                    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
                 renderAttendanceHistory();
                 renderPublicDashboard();
-            }, (err) => console.error("Attendance snapshot error:", err));
+            }, (err) => console.warn("Attendance snapshot error:", err));
 
             // ৪. ইউনিয়ন অ্যাডমিন লিসেনার
             const adminsCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_admins');
@@ -1161,20 +1273,17 @@
                 const masterPhones = new Set(DEFAULT_ADMINS.map(a => a.phone));
                 adminsData = [...DEFAULT_ADMINS, ...dbAdmins.filter(a => !masterPhones.has(a.phone))];
                 renderAdminList();
-            }, (err) => console.error("Admins snapshot error:", err));
+            }, (err) => console.warn("Admins snapshot error:", err));
 
-            // ৫. জরুরি নোটিশ বোর্ড লিসেনার
+            // ৫. নোটিশ বোর্ড লিসেনার
             const noticeDoc = doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice');
             onSnapshot(noticeDoc, (docSnap) => {
-                if (docSnap.exists()) {
-                    currentNotice = docSnap.data();
-                } else {
-                    currentNotice = null;
-                }
+                currentNotice = docSnap.exists() ? docSnap.data() : null;
                 renderNoticeBanner();
-            }, (err) => console.error("Notice snapshot error:", err));
+            }, (err) => console.warn("Notice snapshot error:", err));
         }
 
+        // --- পরিসংখ্যান আপডেট ---
         function updateDashboardStats() {
             const leaders = peopleData.filter(p => p.type === 'leader').length;
             const members = peopleData.filter(p => p.type === 'member').length;
@@ -1190,9 +1299,9 @@
             document.getElementById('badge-count-sudhi').innerText = toBengaliDigits(sudhi);
         }
 
-        // --- RENDER ORGANIZATIONAL DASHBOARD ---
+        // --- সাংগঠনিক ড্যাশবোর্ড রেন্ডার ---
         window.renderPublicDashboard = function() {
-            // ১. অ্যাডমিন বায়তুলমাল কার্ড
+            // ১. অ্যাডমিন বায়তুলমাল সারসংক্ষেপ কার্ড
             const adminFinCard = document.getElementById('dash-admin-finance-card');
             if (currentUser && adminFinCard) {
                 adminFinCard.classList.remove('hidden');
@@ -1210,7 +1319,7 @@
                 adminFinCard.classList.add('hidden');
             }
 
-            // ২. ব্লাড গ্রুপ ম্যাট্রিক্স
+            // ২. ব্লাড ব্যাংক ম্যাট্রিক্স
             const bloodGrid = document.getElementById('dash-blood-grid');
             if (bloodGrid) {
                 const groups = ['O+', 'A+', 'B+', 'AB+', 'O-', 'A-', 'B-', 'AB-'];
@@ -1255,7 +1364,7 @@
                 }).join('');
             }
 
-            // ৪. সাম্প্রতিক প্রোগ্রাম
+            // ৪. সাম্প্রতিক প্রোগ্রাম ও উপস্থিতি
             const progList = document.getElementById('dash-recent-programs');
             if (progList) {
                 const recent = attendanceData.slice(0, 4);
@@ -1292,7 +1401,7 @@
             renderPeopleList();
         };
 
-        // --- TAB & QUICK FILTER ---
+        // --- ট্যাব পরিবর্তন ---
         window.switchTab = function(tab) {
             currentTab = tab;
             ['dashboard', 'leaders', 'members', 'sudhi', 'attendance', 'finance'].forEach(t => {
@@ -1383,8 +1492,12 @@
             emptyState.classList.add('hidden');
 
             filtered.forEach(person => {
-                const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent((person.name || '?').charAt(0))}`;
-                const photoUrl = person.photo || defaultAvatar;
+                const initialChar = (person.name || '?').trim().charAt(0);
+                const photoUrl = person.photo || '';
+                const avatarHtml = photoUrl
+                    ? `<img src="${photoUrl}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="${person.name}" class="w-14 h-14 rounded-2xl object-cover border border-gray-200 shrink-0 shadow-sm"><div style="display:none" class="w-14 h-14 rounded-2xl bg-primary text-white font-bold text-xl items-center justify-center shrink-0 shadow-sm border border-primary/20">${initialChar}</div>`
+                    : `<div class="w-14 h-14 rounded-2xl bg-primary text-white font-bold text-xl flex items-center justify-center shrink-0 shadow-sm border border-primary/20">${initialChar}</div>`;
+
                 const cleanPhone = (person.phone || '').replace(/[^0-9]/g, '');
                 const waNumber = cleanPhone.startsWith('88') ? cleanPhone : '88' + cleanPhone;
                 const fixedBadge = (currentUser && Number(person.fixedIyanat) > 0)
@@ -1402,7 +1515,7 @@
                 card.className = `bg-white rounded-2xl border border-gray-200/80 border-l-4 ${accentColor} shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden`;
                 card.innerHTML = `
                     <div onclick="openPersonDetail('${person.id}')" class="p-3.5 flex items-center gap-3 cursor-pointer active:bg-gray-50 transition">
-                        <img src="${photoUrl}" onerror="this.src='${defaultAvatar}'" alt="${person.name}" class="w-14 h-14 rounded-2xl object-cover border border-gray-200 shrink-0 shadow-sm">
+                        ${avatarHtml}
                         <div class="flex-1 min-w-0">
                             <div class="flex items-start justify-between gap-1">
                                 <h3 class="font-bold text-gray-900 text-sm sm:text-base truncate leading-snug">${person.name}</h3>
@@ -1440,8 +1553,10 @@
             if (!person) return;
             selectedPersonForModal = person;
 
-            const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent((person.name || '?').charAt(0))}`;
-            document.getElementById('detail-photo').src = person.photo || defaultAvatar;
+            const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=IJA`;
+            const detailPhotoEl = document.getElementById('detail-photo');
+            detailPhotoEl.src = person.photo || defaultAvatar;
+            detailPhotoEl.onerror = () => { detailPhotoEl.src = defaultAvatar; };
             document.getElementById('detail-name').innerText = person.name;
             document.getElementById('detail-designation').innerText = person.designation;
             document.getElementById('detail-union').innerText = person.union;
@@ -1602,13 +1717,16 @@
         };
 
         async function uploadToImgBB(base64Image) {
-            try {
-                const formData = new FormData();
-                formData.append("image", base64Image);
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                const data = await res.json();
-                if (data && data.success) return data.data.url;
-            } catch (e) { console.error("ImgBB error:", e); }
+            const keys = [IMGBB_API_KEY, IMGBB_FALLBACK_KEY];
+            for (const key of keys) {
+                try {
+                    const formData = new FormData();
+                    formData.append("image", base64Image);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${key}`, { method: "POST", body: formData });
+                    const data = await res.json();
+                    if (data && data.success) return data.data.url;
+                } catch (e) { console.error("ImgBB error:", e); }
+            }
             return null;
         }
 
@@ -1628,18 +1746,22 @@
                 const phone = toEnglishDigits(document.getElementById('person-phone').value.trim());
                 const fixedIyanat = Number(document.getElementById('person-fixed-iyanat').value || 0);
 
-                let photoUrl = id ? (peopleData.find(p => p.id === id)?.photo || '') : '';
+                const existingPerson = id ? peopleData.find(p => p.id === id) : null;
+                let photoUrl = existingPerson ? (existingPerson.photo || existingPerson.photoUrl || '') : '';
                 if (selectedPhotoBase64) {
                     const uploadedUrl = await uploadToImgBB(selectedPhotoBase64);
                     if (uploadedUrl) photoUrl = uploadedUrl;
                 }
 
-                const payload = { type, union, name, designation, bloodGroup, phone, fixedIyanat, photo: photoUrl, updatedAt: new Date().toISOString() };
+                const payload = { type, union, name, designation, bloodGroup, phone, fixedIyanat, photo: photoUrl, photoUrl: photoUrl, updatedAt: new Date().toISOString() };
 
                 if (isFirebaseReady && db) {
                     if (id) {
-                        // setDoc merge ব্যবহার করায় প্রিসেট দায়িত্বশীলদের এডিট করলেও কোনো এরর আসবে না
+                        // setDoc merge ব্যবহার করায় প্রিসেট বা পুরোনো দায়িত্বশীলদের এডিট করলেও কোনো এরর আসবে না
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', id), payload, { merge: true });
+                        if (existingPerson && existingPerson._legacyId) {
+                            await setDoc(doc(db, 'members', existingPerson._legacyId), payload, { merge: true }).catch(() => {});
+                        }
                     } else {
                         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people'), payload);
                     }
@@ -1670,7 +1792,12 @@
             showConfirmModal("তথ্য মুছে ফেলুন", `আপনি কি নিশ্চিতভাবে "${person.name}"-এর তথ্য মুছে ফেলতে চান?`, async () => {
                 try {
                     if (isFirebaseReady && db) {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', person.id));
+                        if (person._inNewDb || !person._legacyId) {
+                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', person.id)).catch(() => {});
+                        }
+                        if (person._legacyId) {
+                            await deleteDoc(doc(db, 'members', person._legacyId)).catch(() => {});
+                        }
                     }
                     peopleData = peopleData.filter(p => p.id !== person.id);
                     updateDashboardStats();
