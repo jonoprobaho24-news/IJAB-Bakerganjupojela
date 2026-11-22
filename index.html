@@ -157,7 +157,7 @@
                 <span>ডিজিটাল সাংগঠনিক পোর্টাল</span>
             </div>
             <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight leading-snug">
-                সুশৃঙ্খল সংগঠন, আদর্শ যুব সমাজ গঠনে অঙ্গীকারবদ্ধ
+                আদর্শবান যুবকরা জাগলেই জাগবে বাংলাদেশ
             </h2>
             <p class="text-xs sm:text-sm text-green-100/90 mt-1 max-w-xl mx-auto">
                 বাকেরগঞ্জ উপজেলা ও অধীনস্থ ১০টি সাংগঠনিক শাখার দায়িত্বশীল, সদস্য, রক্তদাতা ও বায়তুলমাল ব্যবস্থাপনা
@@ -500,12 +500,17 @@
     </main>
 
     <!-- Clean Official Footer -->
-    <footer class="bg-white border-t border-gray-200/80 py-4 px-4 text-center text-xs text-gray-500 mt-auto no-print">
+    <footer class="bg-white border-t border-gray-200/80 py-4 pb-20 sm:pb-6 px-4 text-center text-xs text-gray-500 mt-auto no-print">
         <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p class="font-bold text-primary">ইসলামী যুব আন্দোলন বাংলাদেশ • বাকেরগঞ্জ উপজেলা শাখা</p>
             <p class="text-[11px] text-gray-400">ডিজিটাল সাংগঠনিক ও বায়তুলমাল ব্যবস্থাপনা পোর্টাল</p>
         </div>
     </footer>
+
+    <!-- Floating Action Button (FAB) for Admin Only -->
+    <button id="fab-add-person" onclick="openPersonModal()" class="hidden fixed bottom-6 right-5 sm:right-8 z-40 w-14 h-14 rounded-full bg-primary hover:bg-primary-light text-white shadow-xl border-2 border-amber-300 flex items-center justify-center text-2xl transition-transform active:scale-95 hover:scale-105 no-print" title="নতুন সদস্য/দায়িত্বশীল যুক্ত করুন">
+        <i class="fas fa-plus"></i>
+    </button>
 
     <!-- ==================== MODALS ==================== -->
 
@@ -517,7 +522,7 @@
                     <i class="fas fa-times"></i>
                 </button>
                 <div class="flex items-center gap-3.5">
-                    <img id="detail-photo" src="" alt="Photo" class="w-16 h-16 rounded-full object-cover border-2 border-secondary bg-white shadow">
+                    <img id="detail-photo" src="" referrerpolicy="no-referrer" alt="Photo" class="w-16 h-16 rounded-full object-cover border-2 border-secondary bg-white shadow">
                     <div>
                         <div class="flex items-center gap-1.5 flex-wrap">
                             <span id="detail-type-badge" class="inline-block px-2 py-0.5 bg-secondary text-primary-dark text-[10px] font-bold rounded-full mb-1">দায়িত্বশীল</span>
@@ -599,7 +604,7 @@
                 <input type="hidden" id="person-id">
                 <div class="flex flex-col items-center gap-2">
                     <div class="relative w-20 h-20">
-                        <img id="person-photo-preview" src="https://placehold.co/150x150/0f5132/ffffff?text=Photo" class="w-20 h-20 rounded-full object-cover border-2 border-primary">
+                        <img id="person-photo-preview" src="https://placehold.co/150x150/0f5132/ffffff?text=Photo" referrerpolicy="no-referrer" class="w-20 h-20 rounded-full object-cover border-2 border-primary">
                         <label for="person-photo-input" class="absolute bottom-0 right-0 w-7 h-7 bg-secondary text-primary-dark rounded-full flex items-center justify-center cursor-pointer shadow border border-white">
                             <i class="fas fa-camera text-xs"></i>
                         </label>
@@ -937,7 +942,7 @@
     <!-- ==================== JAVASCRIPT & FIREBASE ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ১০টি সাংগঠনিক শাখা
@@ -947,7 +952,7 @@
             "নিয়ামতি ইউনিয়ন", "বোয়ালিয়া সাংগঠনিক ইউনিয়ন"
         ];
 
-        // ১২ মাসের বাংলা তালিকা (আগে এটি মুছে গিয়েছিল, এখন সঠিকভাবে যুক্ত করা হলো)
+        // ১২ মাসের বাংলা তালিকা
         const MONTHS_BN = [
             "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
             "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
@@ -1011,8 +1016,9 @@
         let currentTab = 'dashboard';
         let selectedPersonForModal = null;
         let selectedPhotoBase64 = null;
+        let selectedPhotoDataUrl = null;
 
-        // বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর (লগইন ও মোবাইল নম্বরের জন্য)
+        // বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর
         function toEnglishDigits(str) {
             const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
             return String(str || '').replace(/[০-৯]/g, d => bn.indexOf(d));
@@ -1183,13 +1189,11 @@
         // --- FIREBASE SYSTEM INITIALIZATION ---
         async function initializeAppSystem() {
             try {
-                // সবসময় আপনার আসল লাইভ ফায়ারবেস (ijab-bakerganj) ব্যবহার করা হবে
                 appId = 'ijab-bakerganj';
                 const app = initializeApp(LIVE_FIREBASE_CONFIG);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // অ্যানোনিমাস লগইন ব্যর্থ হলেও যেন ডেটা ও ছবি লোড হওয়া আটকে না যায়
                 try {
                     await signInAnonymously(auth);
                 } catch (authErr) {
@@ -1495,7 +1499,7 @@
                 const initialChar = (person.name || '?').trim().charAt(0);
                 const photoUrl = person.photo || '';
                 const avatarHtml = photoUrl
-                    ? `<img src="${photoUrl}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="${person.name}" class="w-14 h-14 rounded-2xl object-cover border border-gray-200 shrink-0 shadow-sm"><div style="display:none" class="w-14 h-14 rounded-2xl bg-primary text-white font-bold text-xl items-center justify-center shrink-0 shadow-sm border border-primary/20">${initialChar}</div>`
+                    ? `<img src="${photoUrl}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="${person.name}" class="w-14 h-14 rounded-2xl object-cover border border-gray-200 shrink-0 shadow-sm"><div style="display:none" class="w-14 h-14 rounded-2xl bg-primary text-white font-bold text-xl items-center justify-center shrink-0 shadow-sm border border-primary/20">${initialChar}</div>`
                     : `<div class="w-14 h-14 rounded-2xl bg-primary text-white font-bold text-xl flex items-center justify-center shrink-0 shadow-sm border border-primary/20">${initialChar}</div>`;
 
                 const cleanPhone = (person.phone || '').replace(/[^0-9]/g, '');
@@ -1673,6 +1677,7 @@
         // --- ADD/EDIT PERSON ---
         window.openPersonModal = function(personToEdit = null) {
             selectedPhotoBase64 = null;
+            selectedPhotoDataUrl = null;
             document.getElementById('person-form').reset();
             const unionSelect = document.getElementById('person-union');
 
@@ -1693,7 +1698,7 @@
                 document.getElementById('person-blood').value = personToEdit.bloodGroup || '';
                 document.getElementById('person-phone').value = personToEdit.phone;
                 document.getElementById('person-fixed-iyanat').value = personToEdit.fixedIyanat || '';
-                document.getElementById('person-photo-preview').src = personToEdit.photo || `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent((personToEdit.name || '?').charAt(0))}`;
+                document.getElementById('person-photo-preview').src = personToEdit.photo || `https://placehold.co/150x150/0f5132/ffffff?text=IJA`;
             } else {
                 document.getElementById('person-form-title').innerText = "নতুন তথ্য যুক্ত করুন";
                 document.getElementById('person-id').value = "";
@@ -1705,15 +1710,48 @@
             document.getElementById('person-form-modal').classList.remove('hidden');
         };
 
-        window.previewPhoto = function(event) {
+        // ছবি অটো-কমপ্রেস (দ্রুত আপলোড ও ১০০% নিশ্চিত সেভ হওয়ার জন্য)
+        function compressImageFile(file, maxSize = 400, quality = 0.78) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = reject;
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onerror = reject;
+                    img.onload = function() {
+                        let w = img.width, h = img.height;
+                        if (w > h && w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
+                        else if (h >= w && h > maxSize) { w = Math.round((w * maxSize) / h); h = maxSize; }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.previewPhoto = async function(event) {
             const file = event.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('person-photo-preview').src = e.target.result;
-                selectedPhotoBase64 = e.target.result.split(',')[1];
-            };
-            reader.readAsDataURL(file);
+            try {
+                const compressedDataUrl = await compressImageFile(file, 400, 0.78);
+                document.getElementById('person-photo-preview').src = compressedDataUrl;
+                selectedPhotoDataUrl = compressedDataUrl;
+                selectedPhotoBase64 = compressedDataUrl.split(',')[1];
+            } catch (err) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('person-photo-preview').src = e.target.result;
+                    selectedPhotoDataUrl = e.target.result;
+                    selectedPhotoBase64 = e.target.result.split(',')[1];
+                };
+                reader.readAsDataURL(file);
+            }
         };
 
         async function uploadToImgBB(base64Image) {
@@ -1750,14 +1788,14 @@
                 let photoUrl = existingPerson ? (existingPerson.photo || existingPerson.photoUrl || '') : '';
                 if (selectedPhotoBase64) {
                     const uploadedUrl = await uploadToImgBB(selectedPhotoBase64);
-                    if (uploadedUrl) photoUrl = uploadedUrl;
+                    // ImgBB কোনো কারণে ব্যর্থ হলে ছোট কমপ্রেসড ছবিটি সরাসরি ফায়ারবেসে সেভ হবে
+                    photoUrl = uploadedUrl || selectedPhotoDataUrl || photoUrl;
                 }
 
                 const payload = { type, union, name, designation, bloodGroup, phone, fixedIyanat, photo: photoUrl, photoUrl: photoUrl, updatedAt: new Date().toISOString() };
 
                 if (isFirebaseReady && db) {
                     if (id) {
-                        // setDoc merge ব্যবহার করায় প্রিসেট বা পুরোনো দায়িত্বশীলদের এডিট করলেও কোনো এরর আসবে না
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', id), payload, { merge: true });
                         if (existingPerson && existingPerson._legacyId) {
                             await setDoc(doc(db, 'members', existingPerson._legacyId), payload, { merge: true }).catch(() => {});
@@ -1778,7 +1816,7 @@
                 }
 
                 closeModal('person-form-modal');
-                showToast('তথ্য সফলভাবে সংরক্ষিত হয়েছে!', 'success');
+                showToast('তথ্য ও ছবি সফলভাবে সংরক্ষিত হয়েছে!', 'success');
             } catch (err) {
                 console.error(err);
                 showToast('সংরক্ষণ করতে সমস্যা হয়েছে!', 'error');
@@ -2582,6 +2620,7 @@
             const tabSudhi = document.getElementById('tab-sudhi');
             const tabAttendance = document.getElementById('tab-attendance');
             const btnSuperSettings = document.getElementById('btn-super-settings');
+            const fabAdd = document.getElementById('fab-add-person');
 
             if (currentUser) {
                 btnLogin.classList.add('hidden');
@@ -2590,6 +2629,7 @@
                 tabFinance.classList.remove('hidden');
                 tabSudhi.classList.remove('hidden');
                 tabAttendance.classList.remove('hidden');
+                if (fabAdd) fabAdd.classList.remove('hidden');
 
                 if (currentUser.role === 'super') {
                     document.getElementById('admin-role-text').innerText = `${currentUser.name} (সকল শাখা নিয়ন্ত্রণ)`;
@@ -2606,6 +2646,7 @@
                 tabSudhi.classList.add('hidden');
                 tabAttendance.classList.add('hidden');
                 btnSuperSettings.classList.add('hidden');
+                if (fabAdd) fabAdd.classList.add('hidden');
             }
             renderNoticeBanner();
             renderPublicDashboard();
@@ -2743,12 +2784,18 @@
 
         window.addEventListener('DOMContentLoaded', () => { initPWA(); initUI(); initializeAppSystem(); });
 
-        // --- PWA APP INSTALL SETUP ---
+        // --- PWA CACHE CLEAR & INSTALL SETUP ---
         let deferredInstallPrompt = null;
         function initPWA() {
             try {
+                // পুরোনো ক্যাশ ক্লিয়ার করা যাতে Netlify-তে আপলোড করা নতুন কোড সাথে সাথে দেখায়
+                if ('caches' in window) {
+                    caches.keys().then(names => names.forEach(name => caches.delete(name))).catch(() => {});
+                }
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('./sw.js').catch(() => {});
+                    navigator.serviceWorker.getRegistrations().then(regs => {
+                        regs.forEach(reg => reg.update().catch(() => {}));
+                    }).catch(() => {});
                 }
             } catch (e) {}
         }
