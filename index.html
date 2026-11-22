@@ -208,6 +208,17 @@
             </div>
         </div>
 
+        <!-- Firebase Permission Warning Banner (Shown automatically if Firestore rules expired) -->
+        <div id="firebase-permission-alert" class="hidden bg-red-50 border border-red-300 text-red-900 rounded-2xl p-3.5 mb-4 shadow-sm text-xs sm:text-sm">
+            <div class="flex items-start gap-2.5">
+                <i class="fas fa-exclamation-circle text-red-600 text-lg mt-0.5 shrink-0"></i>
+                <div>
+                    <p class="font-bold text-red-800">ফায়ারবেস ডেটাবেস পারমিশন (Rules) বন্ধ আছে!</p>
+                    <p class="text-red-700 mt-0.5">আপনার আগের ছবি ও হিসাব-নিকাশ ডেটাবেসেই নিরাপদে আছে, কিন্তু Firebase-এর ৩০ দিনের Test Mode-এর মেয়াদ শেষ হওয়ায় লোড হতে পারছে না। Firebase Console → Firestore Database → Rules-এ গিয়ে <code>allow read, write: if true;</code> করে Publish করলেই সব ডেটা ফিরে আসবে।</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Notice Board Banner (Animated Marquee) -->
         <div id="notice-board-banner" class="hidden bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300/80 rounded-2xl p-3 mb-4 shadow-sm overflow-hidden">
             <div class="flex items-center justify-between gap-2">
@@ -240,6 +251,9 @@
                 </div>
             </div>
             <div id="admin-quick-actions" class="flex flex-wrap gap-2">
+                <button onclick="openNoticeModal()" class="bg-white/15 hover:bg-white/25 text-amber-200 border border-amber-300/40 text-xs px-3 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
+                    <i class="fas fa-bullhorn"></i> নোটিশ বোর্ড
+                </button>
                 <button onclick="openPersonModal()" class="bg-amber-400 hover:bg-amber-300 text-primary-dark text-xs px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
                     <i class="fas fa-plus"></i> নতুন যুক্ত করুন
                 </button>
@@ -1008,15 +1022,30 @@
         let newDbPeople = [];
         let legacyDbPeople = [];
         let peopleData = [...UPAZILA_LEADERS_PRESET];
+
+        // সবগুলো সম্ভাব্য বায়তুলমাল কালেকশন থেকে ডেটা রাখার জন্য স্টোর
+        const financeBuckets = {
+            ijab_finance: [],
+            transactions: [],
+            finance: [],
+            funds: []
+        };
         let financeData = [];
         let attendanceData = [];
         let adminsData = [...DEFAULT_ADMINS];
+        let newDbNotice = null;
+        let legacyDbNotice = null;
         let currentNotice = null;
         let currentUser = null;
         let currentTab = 'dashboard';
         let selectedPersonForModal = null;
         let selectedPhotoBase64 = null;
         let selectedPhotoDataUrl = null;
+
+        function showFirebasePermissionAlert() {
+            const el = document.getElementById('firebase-permission-alert');
+            if (el) el.classList.remove('hidden');
+        }
 
         // বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর
         function toEnglishDigits(str) {
@@ -1029,6 +1058,7 @@
             const raw = String(u || '').trim();
             const map = {
                 "বাকেরগঞ্জ উপজেলা শাখা": "বাকেরগঞ্জ উপজেলা শাখা",
+                "উপজেলা শাখা": "বাকেরগঞ্জ উপজেলা শাখা",
                 "পৌর শাখা": "বাকেরগঞ্জ পৌরসভা",
                 "পৌরসভা": "বাকেরগঞ্জ পৌরসভা",
                 "গারুড়িয়া": "গারুড়িয়া ইউনিয়ন",
@@ -1051,75 +1081,121 @@
             return toEnglishDigits(phone || '').replace(/[^0-9]/g, '').slice(-11);
         }
 
-        // নতুন ও পুরোনো ফায়ারবেস কালেকশন এবং প্রিসেট তালিকা একত্রে মার্জ করা
-        function mergeAllPeopleData() {
-            const legacyByPhone = new Map();
-            const legacyByName = new Map();
-            legacyDbPeople.forEach(lp => {
-                const ph = cleanPhone11(lp.phone);
-                if (ph) legacyByPhone.set(ph, lp);
-                const nm = String(lp.name || '').trim();
-                if (nm) legacyByName.set(nm, lp);
-            });
+        // Firestore Timestamp বা স্ট্রিংকে নিরাপদে ISO তারিখে রূপান্তর
+        function normalizeIsoDate(val) {
+            if (!val) return '';
+            if (typeof val === 'string') return val;
+            if (typeof val.toDate === 'function') return val.toDate().toISOString();
+            if (typeof val.seconds === 'number') return new Date(val.seconds * 1000).toISOString();
+            return '';
+        }
 
-            const getPhoto = (obj) => (obj && (obj.photo || obj.photoUrl || obj.image || obj.imageUrl)) || '';
-
-            const merged = [];
-            const seenPhones = new Set();
+        // নতুন ও পুরোনো সব বায়তুলমাল (আয়-ব্যয়) ডেটা মার্জ করা
+        function mergeAllFinanceData() {
+            const combined = [];
             const seenIds = new Set();
 
-            // ১. নতুন কালেকশনের (ijab_people) ডেটা আগে নেওয়া, ছবি না থাকলে পুরোনোটা থেকে নেওয়া
+            const pushBucket = (list, sourceKey) => {
+                list.forEach(tx => {
+                    const uniqueKey = `${sourceKey}_${tx.id}`;
+                    if (seenIds.has(uniqueKey)) return;
+                    seenIds.add(uniqueKey);
+                    const iso = normalizeIsoDate(tx.createdAt);
+                    const isExpense = tx.type === 'expense' || tx.type === 'ব্যয়';
+                    combined.push({
+                        ...tx,
+                        type: isExpense ? 'expense' : 'income',
+                        union: normalizeUnionName(tx.union),
+                        category: tx.category || (isExpense ? 'ব্যয়' : 'মাসিক ইয়ানত'),
+                        note: tx.note || tx.description || tx.category || '',
+                        personId: tx.personId || tx.memberId || '',
+                        personName: tx.personName || tx.memberName || '',
+                        amount: Number(tx.amount || 0),
+                        date: tx.date || (iso ? iso.split('T')[0] : ''),
+                        createdAt: iso,
+                        _sourceCollection: sourceKey
+                    });
+                });
+            };
+
+            pushBucket(financeBuckets.ijab_finance, 'ijab_finance');
+            pushBucket(financeBuckets.transactions, 'transactions');
+            pushBucket(financeBuckets.finance, 'finance');
+            pushBucket(financeBuckets.funds, 'funds');
+
+            combined.sort((a, b) => (b.createdAt || b.date || '').localeCompare(a.createdAt || a.date || ''));
+            financeData = combined;
+            renderFinance();
+            renderPublicDashboard();
+            if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
+                renderPersonIyanatGrid(selectedPersonForModal);
+            }
+        }
+
+        // নতুন ও পুরোনো নোটিশ মার্জ করা
+        function syncNoticeState() {
+            currentNotice = (newDbNotice && newDbNotice.title)
+                ? newDbNotice
+                : ((legacyDbNotice && legacyDbNotice.title) ? legacyDbNotice : null);
+            renderNoticeBanner();
+        }
+
+        // নতুন (ijab_people), পুরোনো (members) ও প্রিসেট দায়িত্বশীলদের ডেটা ও ছবি একসাথে মার্জ করা
+        function mergeAllPeopleData() {
+            const merged = [];
+            const phoneMap = new Map();
+
+            // ১. নতুন কালেকশন (ijab_people)
             newDbPeople.forEach(p => {
-                const ph = cleanPhone11(p.phone);
-                const nm = String(p.name || '').trim();
-                const legacyMatch = (ph && legacyByPhone.get(ph)) || (nm && legacyByName.get(nm)) || null;
-                const resolvedPhoto = getPhoto(p) || getPhoto(legacyMatch);
-                merged.push({
+                const normPhone = cleanPhone11(p.phone);
+                const item = {
                     ...p,
+                    type: p.type || (p.designation === 'সদস্য' ? 'member' : 'leader'),
                     union: normalizeUnionName(p.union),
-                    photo: resolvedPhoto,
-                    _inNewDb: true,
-                    _legacyId: legacyMatch ? legacyMatch.id : (p._legacyId || null)
-                });
-                if (ph) seenPhones.add(ph);
-                if (p.id) seenIds.add(p.id);
+                    photo: p.photo || p.photoUrl || '',
+                    fixedIyanat: Number(p.fixedIyanat || 0),
+                    _inNewDb: true
+                };
+                merged.push(item);
+                if (normPhone) phoneMap.set(normPhone, item);
             });
 
-            // ২. পুরোনো কালেকশনের (members) ডেটা ও ছবি যুক্ত করা
-            legacyDbPeople.forEach(lp => {
-                const ph = cleanPhone11(lp.phone);
-                if (ph && seenPhones.has(ph)) return;
-
-                const nm = String(lp.name || '').trim();
-                const presetMatch = UPAZILA_LEADERS_PRESET.find(pr =>
-                    (ph && cleanPhone11(pr.phone) === ph) || (nm && pr.name.trim() === nm)
-                );
-                const resolvedType = lp.type || (lp.designation === 'সদস্য' ? 'member' : 'leader');
-                const resolvedPhoto = getPhoto(lp);
-
-                merged.push({
-                    id: presetMatch ? presetMatch.id : lp.id,
-                    type: presetMatch ? presetMatch.type : resolvedType,
-                    name: lp.name || (presetMatch ? presetMatch.name : ''),
-                    designation: lp.designation || (presetMatch ? presetMatch.designation : ''),
-                    union: normalizeUnionName(lp.union || (presetMatch ? presetMatch.union : '')),
-                    phone: lp.phone || (presetMatch ? presetMatch.phone : ''),
-                    bloodGroup: lp.bloodGroup || '',
-                    fixedIyanat: Number(lp.fixedIyanat || 0),
-                    photo: resolvedPhoto,
-                    _inNewDb: false,
-                    _legacyId: lp.id
-                });
-                if (ph) seenPhones.add(ph);
-                if (presetMatch) seenIds.add(presetMatch.id);
-                seenIds.add(lp.id);
+            // ২. পুরোনো কালেকশন (members) — আগে আপলোড করা ছবি ও তথ্য
+            legacyDbPeople.forEach(m => {
+                const normPhone = cleanPhone11(m.phone);
+                const legacyPhoto = m.photoUrl || m.photo || '';
+                if (normPhone && phoneMap.has(normPhone)) {
+                    const existing = phoneMap.get(normPhone);
+                    existing._legacyId = m.id;
+                    if (!existing.photo && legacyPhoto) existing.photo = legacyPhoto;
+                } else {
+                    const item = {
+                        id: m.id,
+                        type: m.type || (m.designation === 'সদস্য' ? 'member' : 'leader'),
+                        name: m.name || 'নাম নেই',
+                        designation: m.designation || 'সদস্য',
+                        union: normalizeUnionName(m.union),
+                        phone: toEnglishDigits(m.phone || ''),
+                        bloodGroup: m.bloodGroup || '',
+                        fixedIyanat: Number(m.fixedIyanat || 0),
+                        photo: legacyPhoto,
+                        _legacyId: m.id,
+                        _inNewDb: false
+                    };
+                    merged.push(item);
+                    if (normPhone) phoneMap.set(normPhone, item);
+                }
             });
 
-            // ৩. অবশিষ্ট উপজেলা প্রিসেট দায়িত্বশীলদের যুক্ত করা
-            UPAZILA_LEADERS_PRESET.forEach(pr => {
-                const ph = cleanPhone11(pr.phone);
-                if (!seenIds.has(pr.id) && (!ph || !seenPhones.has(ph))) {
-                    merged.push({ ...pr, _inNewDb: false, _legacyId: null });
+            // ৩. উপজেলার ২১ জন প্রিসেট দায়িত্বশীল
+            UPAZILA_LEADERS_PRESET.forEach(preset => {
+                const normPhone = cleanPhone11(preset.phone);
+                if (normPhone && phoneMap.has(normPhone)) {
+                    return;
+                }
+                const byName = merged.find(x => (x.name || '').trim() === preset.name.trim());
+                if (!byName) {
+                    merged.push({ ...preset, _isPreset: true });
                 }
             });
 
@@ -1223,68 +1299,77 @@
         function setupRealtimeListeners() {
             if (!isFirebaseReady || !db) return;
 
+            const handleDbError = (label, err) => {
+                console.warn(`${label} error:`, err);
+                if (err && err.code === 'permission-denied') {
+                    showFirebasePermissionAlert();
+                }
+            };
+
             // ১. নতুন কালেকশন (ijab_people) লিসেনার
-            const peopleCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people');
-            onSnapshot(peopleCol, (snapshot) => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people'), (snapshot) => {
                 document.getElementById('loading-spinner').classList.add('hidden');
                 newDbPeople = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                 mergeAllPeopleData();
             }, (err) => {
-                console.error("People snapshot error:", err);
+                handleDbError('ijab_people', err);
                 loadDemoData();
             });
 
-            // ১খ. পুরোনো কালেকশন (members) লিসেনার — আগে আপলোড করা সব ছবি ও সদস্য ফিরিয়ে আনতে
-            const legacyPeopleCol = collection(db, 'members');
-            onSnapshot(legacyPeopleCol, (snapshot) => {
+            // ১খ. পুরোনো কালেকশন (members) লিসেনার
+            onSnapshot(collection(db, 'members'), (snapshot) => {
                 document.getElementById('loading-spinner').classList.add('hidden');
                 legacyDbPeople = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                 mergeAllPeopleData();
-            }, (err) => {
-                console.warn("Legacy members snapshot warning:", err);
-                if (err && err.code === 'permission-denied') {
-                    showToast('ফায়ারবেস ডেটাবেস পারমিশন (Rules) বন্ধ আছে—ছবি ও ডেটা আনতে রুলস চেক করুন।', 'error');
-                }
-            });
+            }, (err) => handleDbError('members', err));
 
-            // ২. বায়তুলমাল (আয়-ব্যয়) লিসেনার
-            const financeCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance');
-            onSnapshot(financeCol, (snapshot) => {
-                financeData = snapshot.docs
-                    .map(d => ({ id: d.id, ...d.data() }))
-                    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-                renderFinance();
-                renderPublicDashboard();
-                if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
-                    renderPersonIyanatGrid(selectedPersonForModal);
-                }
-            }, (err) => console.warn("Finance snapshot error:", err));
+            // ২. বায়তুলমাল (আয়-ব্যয়) লিসেনার — সবগুলো সম্ভাব্য কালেকশন থেকে
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance'), (snapshot) => {
+                financeBuckets.ijab_finance = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                mergeAllFinanceData();
+            }, (err) => handleDbError('ijab_finance', err));
+
+            onSnapshot(collection(db, 'transactions'), (snapshot) => {
+                financeBuckets.transactions = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                mergeAllFinanceData();
+            }, (err) => handleDbError('transactions', err));
+
+            onSnapshot(collection(db, 'finance'), (snapshot) => {
+                financeBuckets.finance = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                mergeAllFinanceData();
+            }, (err) => handleDbError('finance', err));
+
+            onSnapshot(collection(db, 'funds'), (snapshot) => {
+                financeBuckets.funds = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                mergeAllFinanceData();
+            }, (err) => handleDbError('funds', err));
 
             // ৩. প্রোগ্রাম হাজিরা লিসেনার
-            const attendanceCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_attendance');
-            onSnapshot(attendanceCol, (snapshot) => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_attendance'), (snapshot) => {
                 attendanceData = snapshot.docs
                     .map(d => ({ id: d.id, ...d.data() }))
                     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
                 renderAttendanceHistory();
                 renderPublicDashboard();
-            }, (err) => console.warn("Attendance snapshot error:", err));
+            }, (err) => handleDbError('ijab_attendance', err));
 
             // ৪. ইউনিয়ন অ্যাডমিন লিসেনার
-            const adminsCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_admins');
-            onSnapshot(adminsCol, (snapshot) => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_admins'), (snapshot) => {
                 const dbAdmins = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                const masterPhones = new Set(DEFAULT_ADMINS.map(a => a.phone));
-                adminsData = [...DEFAULT_ADMINS, ...dbAdmins.filter(a => !masterPhones.has(a.phone))];
+                adminsData = [...DEFAULT_ADMINS, ...dbAdmins];
                 renderAdminList();
-            }, (err) => console.warn("Admins snapshot error:", err));
+            }, (err) => handleDbError('ijab_admins', err));
 
-            // ৫. নোটিশ বোর্ড লিসেনার
-            const noticeDoc = doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice');
-            onSnapshot(noticeDoc, (docSnap) => {
-                currentNotice = docSnap.exists() ? docSnap.data() : null;
-                renderNoticeBanner();
-            }, (err) => console.warn("Notice snapshot error:", err));
+            // ৫. নোটিশ বোর্ড লিসেনার (নতুন ও পুরোনো উভয় পাথ)
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice'), (docSnap) => {
+                newDbNotice = docSnap.exists() ? docSnap.data() : null;
+                syncNoticeState();
+            }, (err) => handleDbError('notice', err));
+
+            onSnapshot(doc(db, 'settings', 'notice'), (docSnap) => {
+                legacyDbNotice = docSnap.exists() ? docSnap.data() : null;
+                syncNoticeState();
+            }, (err) => handleDbError('legacy_notice', err));
         }
 
         // --- পরিসংখ্যান আপডেট ---
@@ -1710,7 +1795,6 @@
             document.getElementById('person-form-modal').classList.remove('hidden');
         };
 
-        // ছবি অটো-কমপ্রেস (দ্রুত আপলোড ও ১০০% নিশ্চিত সেভ হওয়ার জন্য)
         function compressImageFile(file, maxSize = 400, quality = 0.78) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1788,18 +1872,16 @@
                 let photoUrl = existingPerson ? (existingPerson.photo || existingPerson.photoUrl || '') : '';
                 if (selectedPhotoBase64) {
                     const uploadedUrl = await uploadToImgBB(selectedPhotoBase64);
-                    // ImgBB কোনো কারণে ব্যর্থ হলে ছোট কমপ্রেসড ছবিটি সরাসরি ফায়ারবেসে সেভ হবে
                     photoUrl = uploadedUrl || selectedPhotoDataUrl || photoUrl;
                 }
 
                 const payload = { type, union, name, designation, bloodGroup, phone, fixedIyanat, photo: photoUrl, photoUrl: photoUrl, updatedAt: new Date().toISOString() };
 
                 if (isFirebaseReady && db) {
-                    if (id) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', id), payload, { merge: true });
-                        if (existingPerson && existingPerson._legacyId) {
-                            await setDoc(doc(db, 'members', existingPerson._legacyId), payload, { merge: true }).catch(() => {});
-                        }
+                    if (id && existingPerson && existingPerson._inNewDb) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', id), payload);
+                    } else if (id && existingPerson && existingPerson._legacyId && !existingPerson._inNewDb) {
+                        await updateDoc(doc(db, 'members', existingPerson._legacyId), payload);
                     } else {
                         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people'), payload);
                     }
@@ -1819,6 +1901,7 @@
                 showToast('তথ্য ও ছবি সফলভাবে সংরক্ষিত হয়েছে!', 'success');
             } catch (err) {
                 console.error(err);
+                if (err && err.code === 'permission-denied') showFirebasePermissionAlert();
                 showToast('সংরক্ষণ করতে সমস্যা হয়েছে!', 'error');
             } finally {
                 btn.disabled = false;
@@ -1930,6 +2013,7 @@
                 toggleAllAttendance(false);
                 showToast('হাজিরা সফলভাবে সংরক্ষিত হয়েছে!', 'success');
             } catch (e) {
+                if (e && e.code === 'permission-denied') showFirebasePermissionAlert();
                 showToast('হাজিরা সেভ করতে সমস্যা হয়েছে!', 'error');
             }
         };
@@ -2015,6 +2099,13 @@
         };
 
         // --- FINANCE / BAITULMAL ---
+        function getTransactionDocRef(tx) {
+            if (!tx || !tx._sourceCollection || tx._sourceCollection === 'ijab_finance') {
+                return doc(db, 'artifacts', appId, 'public', 'data', 'ijab_finance', tx.id);
+            }
+            return doc(db, tx._sourceCollection, tx.id);
+        }
+
         window.openFinanceModal = function(txToEdit = null, prefillPerson = null) {
             document.getElementById('finance-form').reset();
             const finUnionSelect = document.getElementById('fin-union');
@@ -2166,8 +2257,12 @@
                 }
 
                 if (isFirebaseReady && db) {
-                    if (txId) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_finance', txId), payload);
-                    else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance'), payload);
+                    if (txId) {
+                        const existingTx = financeData.find(f => f.id === txId);
+                        await updateDoc(getTransactionDocRef(existingTx || { id: txId, _sourceCollection: 'ijab_finance' }), payload);
+                    } else {
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance'), payload);
+                    }
                 } else {
                     if (txId) {
                         const idx = financeData.findIndex(f => f.id === txId);
@@ -2192,6 +2287,7 @@
                     showToast('হিসাব সফলভাবে সংরক্ষিত হয়েছে!', 'success');
                 }
             } catch (e) {
+                if (e && e.code === 'permission-denied') showFirebasePermissionAlert();
                 showToast('হিসাব সংরক্ষণে সমস্যা হয়েছে!', 'error');
             } finally {
                 btn.disabled = false;
@@ -2241,7 +2337,7 @@
                         </div>
                         <div class="min-w-0">
                             <div class="font-bold text-gray-900 text-xs sm:text-sm truncate">
-                                ${tx.personName ? `${tx.personName} (${tx.month})` : tx.note}
+                                ${tx.personName ? `${tx.personName} (${tx.month || tx.category})` : tx.note}
                             </div>
                             <div class="text-[11px] text-gray-500 truncate">
                                 ${tx.union} • ${tx.category} • ${toBengaliDigits(tx.date || '')}
@@ -2272,8 +2368,10 @@
         window.deleteTransaction = function(txId) {
             showConfirmModal("লেনদেন মুছুন", "আপনি কি নিশ্চিতভাবে এই হিসাবটি মুছে ফেলতে চান?", async () => {
                 try {
-                    if (isFirebaseReady && db) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_finance', txId));
-                    else {
+                    const existingTx = financeData.find(f => f.id === txId);
+                    if (isFirebaseReady && db) {
+                        await deleteDoc(getTransactionDocRef(existingTx || { id: txId, _sourceCollection: 'ijab_finance' }));
+                    } else {
                         financeData = financeData.filter(f => f.id !== txId);
                         renderFinance();
                         renderPublicDashboard();
@@ -2417,7 +2515,7 @@
                         <tr class="text-[11px]">
                             <td class="text-center">${toBengaliDigits(i + 1)}</td>
                             <td class="text-center whitespace-nowrap">${toBengaliDigits(t.date || '')}</td>
-                            <td>${t.personName ? `${t.personName} (${t.month} - ${t.category})` : t.note}${union === 'ALL' ? ' [' + t.union + ']' : ''}</td>
+                            <td>${t.personName ? `${t.personName} (${t.month || ''} - ${t.category})` : t.note}${union === 'ALL' ? ' [' + t.union + ']' : ''}</td>
                             <td class="text-center font-bold ${isInc ? 'text-emerald-700' : 'text-red-600'}">${isInc ? 'আয়' : 'ব্যয়'}</td>
                             <td class="text-right font-bold">৳ ${toBengaliDigits(Number(t.amount).toLocaleString())}</td>
                         </tr>
@@ -2551,6 +2649,12 @@
                 }
                 if (currentUser) editBtn.classList.remove('hidden');
                 else editBtn.classList.add('hidden');
+            } else if (currentUser) {
+                banner.classList.remove('hidden');
+                document.getElementById('notice-title-display').innerText = 'এখনো কোনো জরুরি নোটিশ প্রকাশ করা হয়নি';
+                document.getElementById('notice-desc-display').innerText = '— নতুন নোটিশ দিতে ডানপাশের এডিট বাটনে চাপ দিন।';
+                document.getElementById('notice-date-badge').classList.add('hidden');
+                editBtn.classList.remove('hidden');
             } else {
                 banner.classList.add('hidden');
             }
@@ -2572,17 +2676,24 @@
                 updatedAt: new Date().toISOString()
             };
             try {
-                if (isFirebaseReady && db) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice'), payload);
-                else { currentNotice = payload; renderNoticeBanner(); }
+                if (isFirebaseReady && db) {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice'), payload);
+                    await setDoc(doc(db, 'settings', 'notice'), payload).catch(() => {});
+                } else { currentNotice = payload; renderNoticeBanner(); }
                 closeModal('notice-modal');
                 showToast('নোটিশ প্রকাশিত হয়েছে!', 'success');
-            } catch (err) { showToast('নোটিশ প্রকাশে সমস্যা হয়েছে!', 'error'); }
+            } catch (err) {
+                if (err && err.code === 'permission-denied') showFirebasePermissionAlert();
+                showToast('নোটিশ প্রকাশে সমস্যা হয়েছে!', 'error');
+            }
         };
 
         window.clearNotice = async function() {
             try {
-                if (isFirebaseReady && db) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice'), { title: '' });
-                else { currentNotice = null; renderNoticeBanner(); }
+                if (isFirebaseReady && db) {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice'), { title: '' });
+                    await setDoc(doc(db, 'settings', 'notice'), { title: '' }).catch(() => {});
+                } else { currentNotice = null; renderNoticeBanner(); }
                 closeModal('notice-modal');
                 showToast('নোটিশ মুছে ফেলা হয়েছে।', 'info');
             } catch (err) { showToast('সমস্যা হয়েছে!', 'error'); }
@@ -2651,6 +2762,7 @@
             renderNoticeBanner();
             renderPublicDashboard();
             renderPeopleList();
+            renderFinance();
         }
 
         // --- MASTER DASHBOARD, BACKUP & UNION ADMINS ---
@@ -2788,7 +2900,6 @@
         let deferredInstallPrompt = null;
         function initPWA() {
             try {
-                // পুরোনো ক্যাশ ক্লিয়ার করা যাতে Netlify-তে আপলোড করা নতুন কোড সাথে সাথে দেখায়
                 if ('caches' in window) {
                     caches.keys().then(names => names.forEach(name => caches.delete(name))).catch(() => {});
                 }
