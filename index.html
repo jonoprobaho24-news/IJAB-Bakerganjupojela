@@ -629,7 +629,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">ধরণ নির্বাচন করুন *</label>
-                    <select id="person-type" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold">
+                    <select id="person-type" onchange="updateDesignationOptions()" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold">
                         <option value="leader">দায়িত্বশীল</option>
                         <option value="member">সাধারণ সদস্য</option>
                         <option value="sudhi">সুধী / শুভাকাঙ্ক্ষী</option>
@@ -648,8 +648,9 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">পদবি / পেশা *</label>
-                        <input type="text" id="person-designation" required placeholder="যেমন: সভাপতি / ব্যবসায়ী" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm">
+                        <label id="person-designation-label" class="block text-xs font-bold text-gray-700 mb-1">পদবি নির্বাচন করুন *</label>
+                        <select id="person-designation-select" onchange="handleDesignationSelectChange()" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-800"></select>
+                        <input type="text" id="person-designation" placeholder="নিজের পদবি / পেশা লিখুন..." class="hidden mt-2 w-full px-3 py-2 bg-white border border-primary/40 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">রক্তের গ্রুপ</label>
@@ -971,6 +972,24 @@
             "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
             "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
         ];
+
+        // ধরণ অনুযায়ী পদবি ও পেশার ড্রপডাউন তালিকা
+        const DESIGNATIONS_BY_TYPE = {
+            leader: [
+                "সভাপতি", "সহ-সভাপতি", "সাধারণ সম্পাদক", "যুগ্ম সাধারণ সম্পাদক",
+                "সাংগঠনিক সম্পাদক", "দফতর সম্পাদক", "প্রশিক্ষণ সম্পাদক", "দাওয়া সম্পাদক",
+                "প্রচার সম্পাদক", "প্রকাশনা সম্পাদক", "অর্থ সম্পাদক", "যুব উন্নয়ন সম্পাদক",
+                "কর্মসংস্থান সম্পাদক", "শিক্ষা ও সংস্কৃতি সম্পাদক", "বিজ্ঞান ও প্রযুক্তি সম্পাদক",
+                "তথ্য ও গবেষণা সম্পাদক", "ত্রাণ ও সমাজকল্যাণ সম্পাদক", "স্বাস্থ্য ও পরিবেশ সম্পাদক",
+                "উপ-সম্পাদক", "নির্বাহী সদস্য"
+            ],
+            member: [
+                "সাধারণ সদস্য", "সদস্য", "সহযোগী সদস্য", "কর্মী"
+            ],
+            sudhi: [
+                "সুধী", "ব্যবসায়ী", "চাকরিজীবী", "শিক্ষক", "ইমাম / খতিব", "প্রবাসী"
+            ]
+        };
 
         // উপজেলা দায়িত্বশীলদের প্রাথমিক তালিকা
         const UPAZILA_LEADERS_PRESET = [
@@ -1571,6 +1590,17 @@
                 return true;
             });
 
+            // দায়িত্বশীলদের পদবির ক্রম অনুযায়ী সাজানো (সভাপতি -> সহ-সভাপতি -> সাধারণ সম্পাদক...)
+            if (targetType === 'leader') {
+                filtered.sort((a, b) => {
+                    const idxA = DESIGNATIONS_BY_TYPE.leader.indexOf((a.designation || '').trim());
+                    const idxB = DESIGNATIONS_BY_TYPE.leader.indexOf((b.designation || '').trim());
+                    const rankA = idxA === -1 ? 999 : idxA;
+                    const rankB = idxB === -1 ? 999 : idxB;
+                    return rankA - rankB;
+                });
+            }
+
             document.getElementById('people-count').innerText = toBengaliDigits(filtered.length);
             grid.innerHTML = '';
 
@@ -1760,6 +1790,55 @@
         };
 
         // --- ADD/EDIT PERSON ---
+        window.updateDesignationOptions = function(currentVal = '') {
+            const type = document.getElementById('person-type').value || 'leader';
+            const select = document.getElementById('person-designation-select');
+            const customInput = document.getElementById('person-designation');
+            const label = document.getElementById('person-designation-label');
+            if (!select || !customInput) return;
+
+            label.innerText = type === 'sudhi' ? 'পেশা / পরিচয় *' : 'পদবি নির্বাচন করুন *';
+            const options = DESIGNATIONS_BY_TYPE[type] || DESIGNATIONS_BY_TYPE.leader;
+            select.innerHTML = '<option value="">-- পদবি নির্বাচন করুন --</option>' +
+                options.map(opt => `<option value="${opt}">${opt}</option>`).join('') +
+                '<option value="OTHER">অন্যান্য (নিজে লিখুন)</option>';
+
+            if (currentVal) {
+                if (options.includes(currentVal)) {
+                    select.value = currentVal;
+                    customInput.value = '';
+                    customInput.classList.add('hidden');
+                    customInput.required = false;
+                } else {
+                    select.value = 'OTHER';
+                    customInput.value = currentVal;
+                    customInput.classList.remove('hidden');
+                    customInput.required = true;
+                }
+            } else {
+                if (type === 'member') select.value = 'সাধারণ সদস্য';
+                else if (type === 'sudhi') select.value = 'সুধী';
+                else select.value = '';
+                customInput.value = '';
+                customInput.classList.add('hidden');
+                customInput.required = false;
+            }
+        };
+
+        window.handleDesignationSelectChange = function() {
+            const select = document.getElementById('person-designation-select');
+            const customInput = document.getElementById('person-designation');
+            if (select.value === 'OTHER') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+                customInput.focus();
+            } else {
+                customInput.classList.add('hidden');
+                customInput.required = false;
+                customInput.value = '';
+            }
+        };
+
         window.openPersonModal = function(personToEdit = null) {
             selectedPhotoBase64 = null;
             selectedPhotoDataUrl = null;
@@ -1779,7 +1858,7 @@
                 document.getElementById('person-type').value = personToEdit.type;
                 document.getElementById('person-union').value = personToEdit.union;
                 document.getElementById('person-name').value = personToEdit.name;
-                document.getElementById('person-designation').value = personToEdit.designation;
+                updateDesignationOptions(personToEdit.designation || '');
                 document.getElementById('person-blood').value = personToEdit.bloodGroup || '';
                 document.getElementById('person-phone').value = personToEdit.phone;
                 document.getElementById('person-fixed-iyanat').value = personToEdit.fixedIyanat || '';
@@ -1789,6 +1868,7 @@
                 document.getElementById('person-id').value = "";
                 const typeMap = { 'leaders': 'leader', 'members': 'member', 'sudhi': 'sudhi' };
                 document.getElementById('person-type').value = typeMap[currentTab] || 'leader';
+                updateDesignationOptions('');
                 document.getElementById('person-photo-preview').src = "https://placehold.co/150x150/0f5132/ffffff?text=Photo";
             }
 
@@ -1863,7 +1943,16 @@
                 const type = document.getElementById('person-type').value;
                 const union = document.getElementById('person-union').value;
                 const name = document.getElementById('person-name').value.trim();
-                const designation = document.getElementById('person-designation').value.trim();
+                const desigSelect = document.getElementById('person-designation-select').value;
+                const designation = desigSelect === 'OTHER'
+                    ? document.getElementById('person-designation').value.trim()
+                    : desigSelect;
+                if (!designation) {
+                    showToast('দয়া করে পদবি নির্বাচন করুন!', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> সংরক্ষণ করুন';
+                    return;
+                }
                 const bloodGroup = document.getElementById('person-blood').value;
                 const phone = toEnglishDigits(document.getElementById('person-phone').value.trim());
                 const fixedIyanat = Number(document.getElementById('person-fixed-iyanat').value || 0);
