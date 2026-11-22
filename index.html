@@ -134,7 +134,7 @@
                 </button>
                 
                 <div id="admin-controls" class="hidden flex items-center gap-1.5 sm:gap-2">
-                    <button id="btn-notice-open" onclick="openNoticeModal()" class="bg-amber-400 text-primary-dark hover:bg-amber-300 px-2.5 py-2 text-xs rounded-xl font-bold transition flex items-center gap-1 shadow-sm" title="নোটিশ ও প্রোগ্রাম">
+                    <button id="btn-notice-open" onclick="openNoticeModal()" class="hidden bg-amber-400 text-primary-dark hover:bg-amber-300 px-2.5 py-2 text-xs rounded-xl font-bold transition flex items-center gap-1 shadow-sm" title="নোটিশ ও প্রোগ্রাম">
                         <i class="fas fa-bullhorn"></i> <span class="hidden sm:inline">নোটিশ</span>
                     </button>
                     <button id="btn-super-settings" onclick="openSuperSettingsModal()" class="hidden bg-white text-primary hover:bg-gray-100 px-2.5 py-2 text-xs rounded-xl font-bold transition flex items-center gap-1 shadow-sm" title="মাস্টার সেটিংস ও ড্যাশবোর্ড">
@@ -251,7 +251,7 @@
                 </div>
             </div>
             <div id="admin-quick-actions" class="flex flex-wrap gap-2">
-                <button onclick="openNoticeModal()" class="bg-white/15 hover:bg-white/25 text-amber-200 border border-amber-300/40 text-xs px-3 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
+                <button id="btn-banner-notice" onclick="openNoticeModal()" class="hidden bg-white/15 hover:bg-white/25 text-amber-200 border border-amber-300/40 text-xs px-3 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
                     <i class="fas fa-bullhorn"></i> নোটিশ বোর্ড
                 </button>
                 <button onclick="openPersonModal()" class="bg-amber-400 hover:bg-amber-300 text-primary-dark text-xs px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
@@ -573,7 +573,7 @@
                     </a>
                 </div>
 
-                <!-- 12-Month Iyanat Tracker (Admin Only) -->
+                <!-- 12-Month Iyanat Tracker (Authorized Branch Admin Only) -->
                 <div id="detail-iyanat-section" class="hidden border-t border-gray-200 pt-3">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-xs font-bold text-gray-700 flex items-center gap-1.5">
@@ -828,7 +828,7 @@
         </div>
     </div>
 
-    <!-- 5. Notice Board Modal (Admin) -->
+    <!-- 5. Notice Board Modal (Master Admin Only) -->
     <div id="notice-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
             <div class="bg-amber-500 text-white p-4 flex items-center justify-between">
@@ -1061,6 +1061,13 @@
         let selectedPhotoBase64 = null;
         let selectedPhotoDataUrl = null;
 
+        // নির্দিষ্ট শাখার ওপর বর্তমান অ্যাডমিনের নিয়ন্ত্রণ অধিকার আছে কি না যাচাই
+        function canManageUnion(unionName) {
+            if (!currentUser) return false;
+            if (currentUser.role === 'super') return true;
+            return normalizeUnionName(currentUser.union) === normalizeUnionName(unionName);
+        }
+
         function showFirebasePermissionAlert() {
             const el = document.getElementById('firebase-permission-alert');
             if (el) el.classList.remove('hidden');
@@ -1147,7 +1154,9 @@
             renderFinance();
             renderPublicDashboard();
             if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
-                renderPersonIyanatGrid(selectedPersonForModal);
+                if (canManageUnion(selectedPersonForModal.union)) {
+                    renderPersonIyanatGrid(selectedPersonForModal);
+                }
             }
         }
 
@@ -1393,10 +1402,18 @@
 
         // --- পরিসংখ্যান আপডেট ---
         function updateDashboardStats() {
-            const leaders = peopleData.filter(p => p.type === 'leader').length;
-            const members = peopleData.filter(p => p.type === 'member').length;
-            const sudhi = peopleData.filter(p => p.type === 'sudhi').length;
-            const donors = peopleData.filter(p => p.bloodGroup && p.bloodGroup !== '').length;
+            // ড্রপডাউনে যে ইউনিয়ন/শাখা সিলেক্ট করা আছে, সেই অনুযায়ী সংখ্যা গণনা হবে
+            const unionFilterEl = document.getElementById('union-filter');
+            const selectedUnion = unionFilterEl ? unionFilterEl.value : 'ALL';
+
+            const scopedPeople = (selectedUnion && selectedUnion !== 'ALL')
+                ? peopleData.filter(p => normalizeUnionName(p.union) === normalizeUnionName(selectedUnion))
+                : peopleData;
+
+            const leaders = scopedPeople.filter(p => p.type === 'leader').length;
+            const members = scopedPeople.filter(p => p.type === 'member').length;
+            const sudhi = scopedPeople.filter(p => p.type === 'sudhi' && (!currentUser || currentUser.role === 'super' || canManageUnion(p.union))).length;
+            const donors = scopedPeople.filter(p => p.bloodGroup && p.bloodGroup !== '').length;
 
             document.getElementById('hero-stat-leaders').innerText = toBengaliDigits(leaders);
             document.getElementById('hero-stat-members').innerText = toBengaliDigits(members);
@@ -1563,6 +1580,7 @@
 
         // --- RENDER PEOPLE LIST ---
         window.renderPeopleList = function() {
+            updateDashboardStats();
             const grid = document.getElementById('people-grid');
             const emptyState = document.getElementById('empty-state');
             const search = document.getElementById('search-input').value.toLowerCase().trim();
@@ -1576,7 +1594,7 @@
                 if (p.type !== targetType) return false;
                 if (targetType === 'sudhi') {
                     if (!currentUser) return false;
-                    if (currentUser.role === 'union' && p.union !== currentUser.union) return false;
+                    if (currentUser.role === 'union' && !canManageUnion(p.union)) return false;
                 }
                 if (union !== 'ALL' && p.union !== union) return false;
                 if (blood !== 'ALL' && (p.bloodGroup || '') !== blood) return false;
@@ -1619,7 +1637,7 @@
 
                 const cleanPhone = (person.phone || '').replace(/[^0-9]/g, '');
                 const waNumber = cleanPhone.startsWith('88') ? cleanPhone : '88' + cleanPhone;
-                const fixedBadge = (currentUser && Number(person.fixedIyanat) > 0)
+                const fixedBadge = (canManageUnion(person.union) && Number(person.fixedIyanat) > 0)
                     ? `<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">৳${toBengaliDigits(person.fixedIyanat)}</span>`
                     : '';
                 const bloodBadge = person.bloodGroup
@@ -1692,8 +1710,10 @@
                 bloodBadge.classList.add('hidden');
             }
 
+            const hasControl = canManageUnion(person.union);
+
             const fixedRow = document.getElementById('detail-fixed-iyanat-row');
-            if (currentUser && Number(person.fixedIyanat) > 0) {
+            if (hasControl && Number(person.fixedIyanat) > 0) {
                 fixedRow.classList.remove('hidden');
                 document.getElementById('detail-fixed-iyanat').innerText = `৳ ${toBengaliDigits(Number(person.fixedIyanat).toLocaleString())}`;
             } else {
@@ -1708,21 +1728,17 @@
             const iyanatSec = document.getElementById('detail-iyanat-section');
             const adminActions = document.getElementById('detail-admin-actions');
 
-            if (currentUser) {
+            // শুধুমাত্র নিজ শাখার অ্যাডমিন অথবা মাস্টার অ্যাডমিন ইয়ানত ও এডিট অপশন দেখতে পাবে
+            if (hasControl) {
                 iyanatSec.classList.remove('hidden');
                 renderPersonIyanatGrid(person);
 
-                const canEdit = currentUser.role === 'super' || currentUser.union === person.union;
-                if (canEdit) {
-                    adminActions.classList.remove('hidden');
-                    document.getElementById('detail-edit-btn').onclick = () => {
-                        closeModal('person-detail-modal');
-                        openPersonModal(person);
-                    };
-                    document.getElementById('detail-delete-btn').onclick = () => confirmDeletePerson(person);
-                } else {
-                    adminActions.classList.add('hidden');
-                }
+                adminActions.classList.remove('hidden');
+                document.getElementById('detail-edit-btn').onclick = () => {
+                    closeModal('person-detail-modal');
+                    openPersonModal(person);
+                };
+                document.getElementById('detail-delete-btn').onclick = () => confirmDeletePerson(person);
             } else {
                 iyanatSec.classList.add('hidden');
                 adminActions.classList.add('hidden');
@@ -1765,6 +1781,10 @@
 
         window.quickCollectIyanatFromProfile = function() {
             if (!selectedPersonForModal) return;
+            if (!canManageUnion(selectedPersonForModal.union)) {
+                showToast('আপনি শুধুমাত্র আপনার নিজের শাখার ইয়ানত জমা নিতে পারবেন!', 'error');
+                return;
+            }
             const p = selectedPersonForModal;
             closeModal('person-detail-modal');
             openFinanceModal(null, p);
@@ -1772,6 +1792,10 @@
 
         window.sendDueReminderWA = function() {
             if (!selectedPersonForModal) return;
+            if (!canManageUnion(selectedPersonForModal.union)) {
+                showToast('আপনি শুধুমাত্র আপনার নিজের শাখার সদস্যদের রিমাইন্ডার পাঠাতে পারবেন!', 'error');
+                return;
+            }
             const p = selectedPersonForModal;
             const currentYear = new Date().getFullYear().toString();
             const paidMonths = financeData
@@ -1840,6 +1864,11 @@
         };
 
         window.openPersonModal = function(personToEdit = null) {
+            if (!currentUser) return;
+            if (personToEdit && !canManageUnion(personToEdit.union)) {
+                showToast('আপনি অন্য শাখার তথ্য সংশোধন করতে পারবেন না!', 'error');
+                return;
+            }
             selectedPhotoBase64 = null;
             selectedPhotoDataUrl = null;
             document.getElementById('person-form').reset();
@@ -1856,7 +1885,7 @@
                 document.getElementById('person-form-title').innerText = "তথ্য সংশোধন (এডিট)";
                 document.getElementById('person-id').value = personToEdit.id;
                 document.getElementById('person-type').value = personToEdit.type;
-                document.getElementById('person-union').value = personToEdit.union;
+                document.getElementById('person-union').value = currentUser.role === 'union' ? currentUser.union : personToEdit.union;
                 document.getElementById('person-name').value = personToEdit.name;
                 updateDesignationOptions(personToEdit.designation || '');
                 document.getElementById('person-blood').value = personToEdit.bloodGroup || '';
@@ -1934,14 +1963,24 @@
 
         window.savePerson = async function(event) {
             event.preventDefault();
+            if (!currentUser) return;
+
             const btn = document.getElementById('person-save-btn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...';
 
             try {
                 const id = document.getElementById('person-id').value;
+                const existingPerson = id ? peopleData.find(p => p.id === id) : null;
+                if (existingPerson && !canManageUnion(existingPerson.union)) {
+                    showToast('আপনি অন্য শাখার তথ্য সংশোধন করতে পারবেন না!', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> সংরক্ষণ করুন';
+                    return;
+                }
+
                 const type = document.getElementById('person-type').value;
-                const union = document.getElementById('person-union').value;
+                const union = currentUser.role === 'union' ? currentUser.union : document.getElementById('person-union').value;
                 const name = document.getElementById('person-name').value.trim();
                 const desigSelect = document.getElementById('person-designation-select').value;
                 const designation = desigSelect === 'OTHER'
@@ -1957,7 +1996,6 @@
                 const phone = toEnglishDigits(document.getElementById('person-phone').value.trim());
                 const fixedIyanat = Number(document.getElementById('person-fixed-iyanat').value || 0);
 
-                const existingPerson = id ? peopleData.find(p => p.id === id) : null;
                 let photoUrl = existingPerson ? (existingPerson.photo || existingPerson.photoUrl || '') : '';
                 if (selectedPhotoBase64) {
                     const uploadedUrl = await uploadToImgBB(selectedPhotoBase64);
@@ -1999,6 +2037,10 @@
         };
 
         function confirmDeletePerson(person) {
+            if (!canManageUnion(person.union)) {
+                showToast('আপনি অন্য শাখার তথ্য মুছতে পারবেন না!', 'error');
+                return;
+            }
             showConfirmModal("তথ্য মুছে ফেলুন", `আপনি কি নিশ্চিতভাবে "${person.name}"-এর তথ্য মুছে ফেলতে চান?`, async () => {
                 try {
                     if (isFirebaseReady && db) {
@@ -2056,7 +2098,8 @@
         };
 
         window.saveAttendanceRecord = async function() {
-            const union = document.getElementById('att-union-select').value;
+            if (!currentUser) return;
+            const union = currentUser.role === 'union' ? currentUser.union : document.getElementById('att-union-select').value;
             const programName = document.getElementById('att-program-name').value.trim();
             const date = document.getElementById('att-date').value;
 
@@ -2114,7 +2157,7 @@
 
             let filtered = attendanceData;
             if (currentUser && currentUser.role === 'union') {
-                filtered = attendanceData.filter(a => a.union === currentUser.union);
+                filtered = attendanceData.filter(a => canManageUnion(a.union));
             }
 
             if (filtered.length === 0) {
@@ -2174,6 +2217,11 @@
         };
 
         window.deleteAttendance = function(attId) {
+            const att = attendanceData.find(a => a.id === attId);
+            if (att && !canManageUnion(att.union)) {
+                showToast('আপনি অন্য শাখার হাজিরা মুছতে পারবেন না!', 'error');
+                return;
+            }
             showConfirmModal("হাজিরা মুছুন", "আপনি কি এই হাজিরার রেকর্ডটি মুছে ফেলতে চান?", async () => {
                 try {
                     if (isFirebaseReady && db) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_attendance', attId));
@@ -2196,10 +2244,20 @@
         }
 
         window.openFinanceModal = function(txToEdit = null, prefillPerson = null) {
+            if (!currentUser) return;
+            if (txToEdit && !canManageUnion(txToEdit.union)) {
+                showToast('আপনি অন্য শাখার হিসাব সংশোধন করতে পারবেন না!', 'error');
+                return;
+            }
+            if (prefillPerson && !canManageUnion(prefillPerson.union)) {
+                showToast('আপনি শুধুমাত্র আপনার নিজের শাখার ইয়ানত জমা নিতে পারবেন!', 'error');
+                return;
+            }
+
             document.getElementById('finance-form').reset();
             const finUnionSelect = document.getElementById('fin-union');
 
-            if (currentUser && currentUser.role === 'union') {
+            if (currentUser.role === 'union') {
                 finUnionSelect.value = currentUser.union;
                 finUnionSelect.disabled = true;
             } else {
@@ -2210,7 +2268,7 @@
                 document.getElementById('fin-modal-title').innerText = "হিসাব সংশোধন (এডিট)";
                 document.getElementById('fin-tx-id').value = txToEdit.id;
                 setTxType(txToEdit.type);
-                finUnionSelect.value = txToEdit.union;
+                finUnionSelect.value = currentUser.role === 'union' ? currentUser.union : txToEdit.union;
                 if (txToEdit.type === 'income') {
                     document.getElementById('fin-category').value = txToEdit.category || 'মাসিক ইয়ানত';
                     toggleIyanatFields();
@@ -2226,7 +2284,7 @@
                 setTxType('income');
 
                 if (prefillPerson) {
-                    finUnionSelect.value = prefillPerson.union;
+                    finUnionSelect.value = currentUser.role === 'union' ? currentUser.union : prefillPerson.union;
                     document.getElementById('fin-category').value = prefillPerson.type === 'sudhi' ? 'সুধী ইয়ানত' : 'মাসিক ইয়ানত';
                     toggleIyanatFields();
                     document.getElementById('fin-person-id').value = prefillPerson.id;
@@ -2274,7 +2332,9 @@
         };
 
         window.populateMemberDropdownForIyanat = function() {
-            const selectedUnion = document.getElementById('fin-union').value;
+            const selectedUnion = (currentUser && currentUser.role === 'union')
+                ? currentUser.union
+                : document.getElementById('fin-union').value;
             const cat = document.getElementById('fin-category').value;
             const select = document.getElementById('fin-person-id');
             select.innerHTML = '<option value="">-- নাম সিলেক্ট করুন --</option>';
@@ -2308,19 +2368,27 @@
 
         window.saveTransaction = async function(event) {
             event.preventDefault();
+            if (!currentUser) return;
             const btn = document.getElementById('fin-save-btn');
             btn.disabled = true;
 
             try {
                 const txId = document.getElementById('fin-tx-id').value;
+                const existingTx = txId ? financeData.find(f => f.id === txId) : null;
+                if (existingTx && !canManageUnion(existingTx.union)) {
+                    showToast('আপনি অন্য শাখার হিসাব সংশোধন করতে পারবেন না!', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+
                 const type = document.getElementById('fin-type').value;
-                const union = document.getElementById('fin-union').value;
+                const union = currentUser.role === 'union' ? currentUser.union : document.getElementById('fin-union').value;
                 const amount = Number(document.getElementById('fin-amount').value);
                 const note = document.getElementById('fin-note').value.trim();
 
                 let payload = {
                     type, union, amount, note,
-                    date: txId ? (financeData.find(f => f.id === txId)?.date || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
+                    date: existingTx ? (existingTx.date || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
                     createdAt: new Date().toISOString()
                 };
 
@@ -2336,6 +2404,11 @@
                             return;
                         }
                         personObj = peopleData.find(p => p.id === personId);
+                        if (personObj && !canManageUnion(personObj.union)) {
+                            showToast('আপনি অন্য শাখার সদস্যের ইয়ানত জমা নিতে পারবেন না!', 'error');
+                            btn.disabled = false;
+                            return;
+                        }
                         payload.personId = personId;
                         payload.personName = personObj ? personObj.name : '';
                         payload.month = document.getElementById('fin-month').value;
@@ -2347,7 +2420,6 @@
 
                 if (isFirebaseReady && db) {
                     if (txId) {
-                        const existingTx = financeData.find(f => f.id === txId);
                         await updateDoc(getTransactionDocRef(existingTx || { id: txId, _sourceCollection: 'ijab_finance' }), payload);
                     } else {
                         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance'), payload);
@@ -2393,7 +2465,7 @@
                 filterSelect.disabled = false;
             }
 
-            const selectedUnion = filterSelect.value;
+            const selectedUnion = currentUser.role === 'union' ? currentUser.union : filterSelect.value;
             const filtered = financeData.filter(f => selectedUnion === 'ALL' || f.union === selectedUnion);
 
             let totalIncome = 0, totalExpense = 0;
@@ -2451,13 +2523,22 @@
 
         window.editTransaction = function(txId) {
             const tx = financeData.find(f => f.id === txId);
-            if (tx) openFinanceModal(tx);
+            if (!tx) return;
+            if (!canManageUnion(tx.union)) {
+                showToast('আপনি অন্য শাখার হিসাব সংশোধন করতে পারবেন না!', 'error');
+                return;
+            }
+            openFinanceModal(tx);
         };
 
         window.deleteTransaction = function(txId) {
+            const existingTx = financeData.find(f => f.id === txId);
+            if (existingTx && !canManageUnion(existingTx.union)) {
+                showToast('আপনি অন্য শাখার হিসাব মুছতে পারবেন না!', 'error');
+                return;
+            }
             showConfirmModal("লেনদেন মুছুন", "আপনি কি নিশ্চিতভাবে এই হিসাবটি মুছে ফেলতে চান?", async () => {
                 try {
-                    const existingTx = financeData.find(f => f.id === txId);
                     if (isFirebaseReady && db) {
                         await deleteDoc(getTransactionDocRef(existingTx || { id: txId, _sourceCollection: 'ijab_finance' }));
                     } else {
@@ -2486,7 +2567,9 @@
         };
 
         window.generatePrintableReport = function() {
-            const union = document.getElementById('report-union-select').value;
+            const union = (currentUser && currentUser.role === 'union')
+                ? currentUser.union
+                : document.getElementById('report-union-select').value;
             const selectedMonth = document.getElementById('report-month-select').value;
             const year = document.getElementById('report-year-select').value;
             const personType = document.getElementById('report-person-type').value;
@@ -2716,10 +2799,12 @@
             `;
         };
 
-        // --- NOTICE BOARD ---
+        // --- NOTICE BOARD (Master Admin Only for Editing) ---
         function renderNoticeBanner() {
             const banner = document.getElementById('notice-board-banner');
             const editBtn = document.getElementById('btn-edit-notice-banner');
+            const isMaster = currentUser && currentUser.role === 'super';
+
             if (currentNotice && currentNotice.title) {
                 banner.classList.remove('hidden');
                 document.getElementById('notice-title-display').innerText = currentNotice.title;
@@ -2736,9 +2821,9 @@
                 if (marqueeEl) {
                     marqueeEl.style.animationDuration = Math.max(14, Math.min(40, Math.round(fullTextLen * 0.22))) + 's';
                 }
-                if (currentUser) editBtn.classList.remove('hidden');
+                if (isMaster) editBtn.classList.remove('hidden');
                 else editBtn.classList.add('hidden');
-            } else if (currentUser) {
+            } else if (isMaster) {
                 banner.classList.remove('hidden');
                 document.getElementById('notice-title-display').innerText = 'এখনো কোনো জরুরি নোটিশ প্রকাশ করা হয়নি';
                 document.getElementById('notice-desc-display').innerText = '— নতুন নোটিশ দিতে ডানপাশের এডিট বাটনে চাপ দিন।';
@@ -2750,6 +2835,10 @@
         }
 
         window.openNoticeModal = function() {
+            if (!currentUser || currentUser.role !== 'super') {
+                showToast('শুধুমাত্র উপজেলা মাস্টার অ্যাডমিন নোটিশ পরিবর্তন করতে পারবেন!', 'error');
+                return;
+            }
             document.getElementById('notice-input-title').value = currentNotice?.title || '';
             document.getElementById('notice-input-date').value = currentNotice?.dateInfo || '';
             document.getElementById('notice-input-desc').value = currentNotice?.desc || '';
@@ -2758,6 +2847,10 @@
 
         window.saveNotice = async function(e) {
             e.preventDefault();
+            if (!currentUser || currentUser.role !== 'super') {
+                showToast('শুধুমাত্র উপজেলা মাস্টার অ্যাডমিন নোটিশ প্রকাশ করতে পারবেন!', 'error');
+                return;
+            }
             const payload = {
                 title: document.getElementById('notice-input-title').value.trim(),
                 dateInfo: document.getElementById('notice-input-date').value.trim(),
@@ -2778,6 +2871,7 @@
         };
 
         window.clearNotice = async function() {
+            if (!currentUser || currentUser.role !== 'super') return;
             try {
                 if (isFirebaseReady && db) {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice'), { title: '' });
@@ -2820,7 +2914,10 @@
             const tabSudhi = document.getElementById('tab-sudhi');
             const tabAttendance = document.getElementById('tab-attendance');
             const btnSuperSettings = document.getElementById('btn-super-settings');
+            const btnNoticeOpen = document.getElementById('btn-notice-open');
+            const btnBannerNotice = document.getElementById('btn-banner-notice');
             const fabAdd = document.getElementById('fab-add-person');
+            const unionFilter = document.getElementById('union-filter');
 
             if (currentUser) {
                 btnLogin.classList.add('hidden');
@@ -2834,9 +2931,17 @@
                 if (currentUser.role === 'super') {
                     document.getElementById('admin-role-text').innerText = `${currentUser.name} (সকল শাখা নিয়ন্ত্রণ)`;
                     btnSuperSettings.classList.remove('hidden');
+                    if (btnNoticeOpen) btnNoticeOpen.classList.remove('hidden');
+                    if (btnBannerNotice) btnBannerNotice.classList.remove('hidden');
+                    if (unionFilter) unionFilter.value = 'ALL';
                 } else {
-                    document.getElementById('admin-role-text').innerText = `${currentUser.name} (${currentUser.union} অ্যাডমিন)`;
+                    const normalizedUnion = normalizeUnionName(currentUser.union);
+                    document.getElementById('admin-role-text').innerText = `${currentUser.name} (${normalizedUnion} অ্যাডমিন)`;
                     btnSuperSettings.classList.add('hidden');
+                    if (btnNoticeOpen) btnNoticeOpen.classList.add('hidden');
+                    if (btnBannerNotice) btnBannerNotice.classList.add('hidden');
+                    // ইউনিয়ন অ্যাডমিন লগইন করলে ডিফল্টভাবে নিজের ইউনিয়ন সিলেক্ট থাকবে
+                    if (unionFilter) unionFilter.value = normalizedUnion;
                 }
             } else {
                 btnLogin.classList.remove('hidden');
@@ -2846,8 +2951,12 @@
                 tabSudhi.classList.add('hidden');
                 tabAttendance.classList.add('hidden');
                 btnSuperSettings.classList.add('hidden');
+                if (btnNoticeOpen) btnNoticeOpen.classList.add('hidden');
+                if (btnBannerNotice) btnBannerNotice.classList.add('hidden');
                 if (fabAdd) fabAdd.classList.add('hidden');
+                if (unionFilter) unionFilter.value = 'ALL';
             }
+            updateDashboardStats();
             renderNoticeBanner();
             renderPublicDashboard();
             renderPeopleList();
@@ -2856,6 +2965,7 @@
 
         // --- MASTER DASHBOARD, BACKUP & UNION ADMINS ---
         window.openSuperSettingsModal = function() {
+            if (!currentUser || currentUser.role !== 'super') return;
             renderUnionDashboard();
             renderAdminList();
             document.getElementById('super-settings-modal').classList.remove('hidden');
@@ -2914,6 +3024,7 @@
 
         window.addUnionAdmin = async function(event) {
             event.preventDefault();
+            if (!currentUser || currentUser.role !== 'super') return;
             const name = document.getElementById('new-admin-name').value.trim();
             const union = document.getElementById('new-admin-union').value;
             const phone = toEnglishDigits(document.getElementById('new-admin-phone').value.trim());
@@ -2949,6 +3060,7 @@
         }
 
         window.removeUnionAdmin = async function(adminId) {
+            if (!currentUser || currentUser.role !== 'super') return;
             try {
                 if (isFirebaseReady && db) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_admins', adminId));
                 else { adminsData = adminsData.filter(a => a.id !== adminId); renderAdminList(); }
