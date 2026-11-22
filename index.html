@@ -337,6 +337,68 @@
 
         <!-- VIEW 1 & 2 & 3: PEOPLE LIST (LEADERS / MEMBERS / SUDHI) -->
         <div id="view-people" class="hidden">
+            <!-- Filter & Search Box -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-gray-200/80 mb-5 space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" id="search-input" oninput="renderPeopleList()" placeholder="নাম, পদবি বা মোবাইল নম্বর খুঁজুন..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                    </div>
+
+                    <div class="relative">
+                        <i class="fas fa-map-marker-alt absolute left-3.5 top-1/2 -translate-y-1/2 text-primary text-sm"></i>
+                        <select id="union-filter" onchange="renderPeopleList()" class="w-full pl-10 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary appearance-none cursor-pointer">
+                            <option value="ALL">সকল শাখা (উপজেলা ও ইউনিয়ন)</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Quick Blood Donor Filter Chips -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-gray-100">
+                    <span class="text-[11px] font-bold text-red-600 flex items-center gap-1 shrink-0 mr-1">
+                        <i class="fas fa-tint"></i> রক্তের গ্রুপ:
+                    </span>
+                    <input type="hidden" id="blood-filter" value="ALL">
+                    <button type="button" onclick="quickSelectBlood('ALL')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-600 text-white ring-2 ring-red-500 transition shrink-0" data-bg="ALL">সব</button>
+                    <button type="button" onclick="quickSelectBlood('O+')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="O+">O+</button>
+                    <button type="button" onclick="quickSelectBlood('A+')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="A+">A+</button>
+                    <button type="button" onclick="quickSelectBlood('B+')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="B+">B+</button>
+                    <button type="button" onclick="quickSelectBlood('AB+')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="AB+">AB+</button>
+                    <button type="button" onclick="quickSelectBlood('O-')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="O-">O-</button>
+                    <button type="button" onclick="quickSelectBlood('A-')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="A-">A-</button>
+                    <button type="button" onclick="quickSelectBlood('B-')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="B-">B-</button>
+                    <button type="button" onclick="quickSelectBlood('AB-')" class="blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0" data-bg="AB-">AB-</button>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-gray-500 pt-1">
+                    <span>তালিকায়: <strong id="people-count" class="text-primary font-bold">০</strong> জন</span>
+                    <span class="text-[11px] flex items-center gap-1"><i class="fas fa-hand-pointer text-primary"></i> বিস্তারিত দেখতে কার্ডে চাপ দিন</span>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading-spinner" class="hidden py-12 text-center">
+                <div class="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-sm text-gray-500 mt-2 font-medium">তথ্য লোড হচ্ছে...</p>
+            </div>
+
+            <!-- People Grid -->
+            <div id="people-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden py-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                <div class="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+                <h3 class="text-base font-bold text-gray-700">কোনো তথ্য পাওয়া যায়নি</h3>
+                <p class="text-xs text-gray-500 mt-1">অন্য শাখা বা ভিন্ন নাম দিয়ে অনুসন্ধান করুন।</p>
+            </div>
+        </div>
+
+        <!-- VIEW 4: PROGRAM ATTENDANCE (ADMIN ONLY) -->
+        <div id="view-attendance" class="hidden space-y-5">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200/80">
                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2 mb-3">
                     <i class="fas fa-clipboard-check text-primary"></i> নতুন প্রোগ্রাম / বৈঠকের হাজিরা নিন
                 </h3>
@@ -878,15 +940,42 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ১০টি সাংগঠনিক শাখা
         const UNIONS = [
             "বাকেরগঞ্জ উপজেলা শাখা", "বাকেরগঞ্জ পৌরসভা", "গারুড়িয়া ইউনিয়ন", "কলসকাঠি ইউনিয়ন",
             "নলুয়া ইউনিয়ন", "ভরপাশা ইউনিয়ন", "পাদ্রীশিবপুর ইউনিয়ন", "রঙ্গশ্রী ইউনিয়ন",
             "নিয়ামতি ইউনিয়ন", "বোয়ালিয়া সাংগঠনিক ইউনিয়ন"
         ];
 
+        // ১২ মাসের বাংলা তালিকা (আগে এটি মুছে গিয়েছিল, এখন সঠিকভাবে যুক্ত করা হলো)
         const MONTHS_BN = [
             "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
             "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
+        ];
+
+        // উপজেলা দায়িত্বশীলদের প্রাথমিক তালিকা
+        const UPAZILA_LEADERS_PRESET = [
+            { id: 'upz_1', type: 'leader', name: 'মাওলানা মুহাঃ জাহিদ রায়হান', designation: 'সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01787265892', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_2', type: 'leader', name: 'আর কে খলিফা রাকিব', designation: 'সহ-সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01955144533', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_3', type: 'leader', name: 'মাওলানা গাজী সাইফুল ইসলাম', designation: 'সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01611110439', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_4', type: 'leader', name: 'মাওঃ মুহাঃ মেহেদী হাসান চৌধুরী', designation: 'যুগ্ম সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01716834335', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_5', type: 'leader', name: 'মাওঃ মুহাঃ মুস্তাকিম বিল্লাহ', designation: 'সাংগঠনিক সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01861041404', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_6', type: 'leader', name: 'মুহাম্মাদ মিরন হাওলাদার', designation: 'সাংগঠনিক সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01728153601', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_7', type: 'leader', name: 'মুহাঃ ফেরদাউস আলম কামাল', designation: 'দফতর সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01722595928', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_8', type: 'leader', name: 'মাওলানা মুহাঃ রফিকুল ইসলাম বোখারী', designation: 'প্রশিক্ষণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01714520148', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_9', type: 'leader', name: 'ক্বারী মাজহারুল ইসলাম মাজহারি', designation: 'দাওয়া সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01731456285', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_10', type: 'leader', name: 'মুহাঃ মেনান বিশ্বাস', designation: 'প্রচার সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01818111495', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_11', type: 'leader', name: 'মাওলানা মুহাঃ রবিউল ইসলাম', designation: 'প্রকাশনা সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01712435185', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_12', type: 'leader', name: 'মুহাঃ আসাদুজ্জামান', designation: 'অর্থ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01728673322', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_13', type: 'leader', name: 'মুহাঃ রফিকুল ইসলাম', designation: 'যুব উন্নয়ন সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01879149237', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_14', type: 'leader', name: 'মুহাঃ নাসিরুদ্দিন', designation: 'কর্মসংস্থান সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01715233240', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_15', type: 'leader', name: 'মুহাঃ নাহিদ হাসান', designation: 'শিক্ষা ও সংস্কৃতি সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01782444063', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_16', type: 'leader', name: 'এইচ এম সালাউদ্দিন মাসরুর', designation: 'বিজ্ঞান ও প্রযুক্তি সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01718823036', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_17', type: 'leader', name: 'মুহাঃ সৌরভ হাওলাদার', designation: 'তথ্য ও গবেষণা সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01772951745', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_18', type: 'leader', name: 'মুহাঃ রেজাউল করিম', designation: 'ত্রাণ ও সমাজকল্যাণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01781674467', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_19', type: 'leader', name: 'মুফতী মুহাঃ সাব্বির আহম্মেদ', designation: 'স্বাস্থ্য ও পরিবেশ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01670572001', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_20', type: 'leader', name: 'হাফেজ নাঈমুর রহমান', designation: 'উপ-সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01319823336', bloodGroup: '', fixedIyanat: 0, photo: '' },
+            { id: 'upz_21', type: 'leader', name: 'আব্দুল্লাহ আননোমান', designation: 'উপ-সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01878984866', bloodGroup: '', fixedIyanat: 0, photo: '' }
         ];
 
         const DEFAULT_ADMINS = [
@@ -896,10 +985,21 @@
 
         const IMGBB_API_KEY = "a92a1ff4a0aa498fd2f3ef937cf40e6e";
 
+        // Firebase Configuration (IJAB Bakerganj)
+        const LIVE_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAx5CAqZZIIzXLmP8TvzSwlOApYq4PE4wI",
+            authDomain: "ijab-bakerganj.firebaseapp.com",
+            projectId: "ijab-bakerganj",
+            storageBucket: "ijab-bakerganj.firebasestorage.app",
+            messagingSenderId: "893273342378",
+            appId: "1:893273342378:web:91d803ada0fc7649cdebd3",
+            measurementId: "G-ZJMM3F4CD0"
+        };
+
         let db = null, auth = null, appId = 'ijab-bakerganj';
         let isFirebaseReady = false;
 
-        let peopleData = [];
+        let peopleData = [...UPAZILA_LEADERS_PRESET];
         let financeData = [];
         let attendanceData = [];
         let adminsData = [...DEFAULT_ADMINS];
@@ -909,27 +1009,85 @@
         let selectedPersonForModal = null;
         let selectedPhotoBase64 = null;
 
+        // বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর (লগইন ও মোবাইল নম্বরের জন্য)
+        function toEnglishDigits(str) {
+            const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return String(str || '').replace(/[০-৯]/g, d => bn.indexOf(d));
+        }
+
+        // --- INITIALIZE UI & DROPDOWNS ---
+        function initUI() {
+            const unionOptionsHtml = UNIONS.map(u => `<option value="${u}">${u}</option>`).join('');
+
+            const unionFilter = document.getElementById('union-filter');
+            const personUnion = document.getElementById('person-union');
+            const finUnion = document.getElementById('fin-union');
+            const financeUnionFilter = document.getElementById('finance-union-filter');
+            const attUnionSelect = document.getElementById('att-union-select');
+            const newAdminUnion = document.getElementById('new-admin-union');
+            const reportUnionSelect = document.getElementById('report-union-select');
+
+            if (unionFilter) unionFilter.innerHTML = `<option value="ALL">সকল শাখা (উপজেলা ও ইউনিয়ন)</option>` + unionOptionsHtml;
+            if (personUnion) personUnion.innerHTML = unionOptionsHtml;
+            if (finUnion) finUnion.innerHTML = unionOptionsHtml;
+            if (financeUnionFilter) financeUnionFilter.innerHTML = `<option value="ALL">সকল শাখা (মোট হিসাব)</option>` + unionOptionsHtml;
+            if (attUnionSelect) attUnionSelect.innerHTML = unionOptionsHtml;
+            if (newAdminUnion) newAdminUnion.innerHTML = unionOptionsHtml;
+            if (reportUnionSelect) reportUnionSelect.innerHTML = `<option value="ALL">সকল শাখা (উপজেলা ও ইউনিয়ন)</option>` + unionOptionsHtml;
+
+            const finMonth = document.getElementById('fin-month');
+            const reportMonthSelect = document.getElementById('report-month-select');
+            const currentMonthIdx = new Date().getMonth();
+
+            if (finMonth) finMonth.innerHTML = '';
+            if (reportMonthSelect) reportMonthSelect.innerHTML = '<option value="ALL">সকল মাস (পুরো বছর)</option>';
+
+            MONTHS_BN.forEach((m, idx) => {
+                if (finMonth) finMonth.innerHTML += `<option value="${m}" ${idx === currentMonthIdx ? 'selected' : ''}>${m}</option>`;
+                if (reportMonthSelect) reportMonthSelect.innerHTML += `<option value="${m}">${m}</option>`;
+            });
+
+            const attDate = document.getElementById('att-date');
+            if (attDate) attDate.value = new Date().toISOString().split('T')[0];
+
+            // পূর্বের লগইন সেশন থাকলে রিস্টোর করা
+            try {
+                const savedUser = localStorage.getItem('ijab_current_admin');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    updateUIForAdmin();
+                }
+            } catch (e) {
+                console.warn("Session restore error:", e);
+            }
+
+            // প্রাথমিক ডেটা রেন্ডার
+            updateDashboardStats();
+            renderPublicDashboard();
+            renderPeopleList();
+        }
+
+        // --- FIREBASE SYSTEM INITIALIZATION ---
         async function initializeAppSystem() {
             try {
-                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                    const firebaseConfig = JSON.parse(__firebase_config);
-                    appId = typeof __app_id !== 'undefined' ? __app_id : 'ijab-bakerganj';
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
+                const activeConfig = (typeof __firebase_config !== 'undefined' && __firebase_config)
+                    ? JSON.parse(__firebase_config)
+                    : LIVE_FIREBASE_CONFIG;
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'ijab-bakerganj';
 
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    isFirebaseReady = true;
-                    setupRealtimeListeners();
+                const app = initializeApp(activeConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    loadDemoData();
+                    await signInAnonymously(auth);
                 }
+                isFirebaseReady = true;
+                setupRealtimeListeners();
             } catch (error) {
-                console.warn("Running in standalone mode:", error);
+                console.warn("Firebase connection fallback:", error);
                 loadDemoData();
             }
         }
@@ -937,20 +1095,7 @@
         function loadDemoData() {
             document.getElementById('loading-spinner').classList.add('hidden');
             if (peopleData.length === 0) {
-                peopleData = [
-                    { id: 'd1', type: 'leader', name: 'মাওলানা মুহা. আব্দুর রহমান', designation: 'সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01787265892', bloodGroup: 'O+', fixedIyanat: 500, photo: '' },
-                    { id: 'd2', type: 'leader', name: 'মুহা. জাহিদুল ইসলাম', designation: 'সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01744432350', bloodGroup: 'B+', fixedIyanat: 400, photo: '' },
-                    { id: 'd3', type: 'leader', name: 'হাফেজ মাওলানা ইউসুফ আলী', designation: 'সভাপতি', union: 'নলুয়া ইউনিয়ন', phone: '01711000001', bloodGroup: 'A+', fixedIyanat: 300, photo: '' },
-                    { id: 'd4', type: 'member', name: 'মোঃ সাইফুল ইসলাম', designation: 'সদস্য', union: 'বাকেরগঞ্জ পৌরসভা', phone: '01711000002', bloodGroup: 'AB+', fixedIyanat: 100, photo: '' },
-                    { id: 'd5', type: 'sudhi', name: 'আলহাজ্ব মাওলানা মোস্তাফিজুর রহমান', designation: 'বিশিষ্ট ব্যবসায়ী (সুধী)', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01711000005', bloodGroup: 'O+', fixedIyanat: 1000, photo: '' }
-                ];
-            }
-            if (financeData.length === 0) {
-                financeData = [
-                    { id: 'f1', type: 'income', category: 'মাসিক ইয়ানত', personId: 'd1', personName: 'মাওলানা মুহা. আব্দুর রহমান', month: 'জানুয়ারি', year: '2026', amount: 500, union: 'বাকেরগঞ্জ উপজেলা শাখা', note: 'জানুয়ারি মাসের ইয়ানত', date: '2026-01-10' },
-                    { id: 'f2', type: 'income', category: 'সুধী ইয়ানত', personId: 'd5', personName: 'আলহাজ্ব মাওলানা মোস্তাফিজুর রহমান', month: 'জানুয়ারি', year: '2026', amount: 1000, union: 'বাকেরগঞ্জ উপজেলা শাখা', note: 'জানুয়ারি মাসের সুধী ইয়ানত', date: '2026-01-12' },
-                    { id: 'f3', type: 'expense', category: 'ব্যয়', amount: 300, union: 'বাকেরগঞ্জ উপজেলা শাখা', note: 'বৈঠক আপ্যায়ন খরচ', date: '2026-01-15' }
-                ];
+                peopleData = [...UPAZILA_LEADERS_PRESET];
             }
             updateDashboardStats();
             renderPublicDashboard();
@@ -958,82 +1103,76 @@
             renderFinance();
         }
 
+        // --- REALTIME FIREBASE LISTENERS ---
         function setupRealtimeListeners() {
             if (!isFirebaseReady || !db) return;
 
+            // ১. দায়িত্বশীল, সদস্য ও সুধী লিসেনার
             const peopleCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people');
             onSnapshot(peopleCol, (snapshot) => {
                 document.getElementById('loading-spinner').classList.add('hidden');
-                peopleData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const dbPeople = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                const dbIds = new Set(dbPeople.map(p => p.id));
+                const dbPhones = new Set(dbPeople.map(p => (p.phone || '').replace(/[^0-9]/g, '').slice(-11)));
+                const remainingPresets = UPAZILA_LEADERS_PRESET.filter(
+                    p => !dbIds.has(p.id) && !dbPhones.has((p.phone || '').replace(/[^0-9]/g, '').slice(-11))
+                );
+                peopleData = [...dbPeople, ...remainingPresets];
                 updateDashboardStats();
                 renderPublicDashboard();
                 renderPeopleList();
-                if (selectedPersonForModal) {
+                if (currentTab === 'attendance') loadAttendanceChecklist();
+                if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
                     const updated = peopleData.find(p => p.id === selectedPersonForModal.id);
                     if (updated) openPersonDetail(updated.id);
                 }
-            }, (err) => console.error(err));
+            }, (err) => {
+                console.error("People snapshot error:", err);
+                loadDemoData();
+            });
 
-            const finCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance');
-            onSnapshot(finCol, (snapshot) => {
-                financeData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                financeData.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-                renderPublicDashboard();
+            // ২. বায়তুলমাল (আয়-ব্যয়) লিসেনার
+            const financeCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_finance');
+            onSnapshot(financeCol, (snapshot) => {
+                financeData = snapshot.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
                 renderFinance();
-                if (selectedPersonForModal) renderPersonIyanatGrid(selectedPersonForModal);
-            }, (err) => console.error(err));
+                renderPublicDashboard();
+                if (selectedPersonForModal && !document.getElementById('person-detail-modal').classList.contains('hidden')) {
+                    renderPersonIyanatGrid(selectedPersonForModal);
+                }
+            }, (err) => console.error("Finance snapshot error:", err));
 
+            // ৩. প্রোগ্রাম হাজিরা লিসেনার
             const attCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_attendance');
             onSnapshot(attCol, (snapshot) => {
-                attendanceData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                attendanceData.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-                renderPublicDashboard();
+                attendanceData = snapshot.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
                 renderAttendanceHistory();
-            }, (err) => console.error(err));
+                renderPublicDashboard();
+            }, (err) => console.error("Attendance snapshot error:", err));
 
-            const noticeDoc = doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice');
-            onSnapshot(noticeDoc, (snap) => {
-                currentNotice = snap.exists() ? snap.data() : null;
-                renderNoticeBanner();
-            }, (err) => console.error(err));
-
+            // ৪. ইউনিয়ন অ্যাডমিন লিসেনার
             const adminsCol = collection(db, 'artifacts', appId, 'public', 'data', 'ijab_admins');
             onSnapshot(adminsCol, (snapshot) => {
-                const dbAdmins = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                adminsData = [...DEFAULT_ADMINS, ...dbAdmins];
+                const dbAdmins = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                const masterPhones = new Set(DEFAULT_ADMINS.map(a => a.phone));
+                adminsData = [...DEFAULT_ADMINS, ...dbAdmins.filter(a => !masterPhones.has(a.phone))];
                 renderAdminList();
-            }, (err) => console.error(err));
-        }
+            }, (err) => console.error("Admins snapshot error:", err));
 
-        function initUI() {
-            const unionFilter = document.getElementById('union-filter');
-            const finUnionFilter = document.getElementById('finance-union-filter');
-            const personUnion = document.getElementById('person-union');
-            const finUnion = document.getElementById('fin-union');
-            const newAdminUnion = document.getElementById('new-admin-union');
-            const reportUnionSelect = document.getElementById('report-union-select');
-            const attUnionSelect = document.getElementById('att-union-select');
-
-            UNIONS.forEach(u => {
-                unionFilter.innerHTML += `<option value="${u}">${u}</option>`;
-                finUnionFilter.innerHTML += `<option value="${u}">${u}</option>`;
-                personUnion.innerHTML += `<option value="${u}">${u}</option>`;
-                finUnion.innerHTML += `<option value="${u}">${u}</option>`;
-                newAdminUnion.innerHTML += `<option value="${u}">${u}</option>`;
-                reportUnionSelect.innerHTML += `<option value="${u}">${u}</option>`;
-                attUnionSelect.innerHTML += `<option value="${u}">${u}</option>`;
-            });
-            reportUnionSelect.innerHTML = `<option value="ALL">সকল শাখা (উপজেলা ও ইউনিয়ন)</option>` + reportUnionSelect.innerHTML;
-
-            const finMonth = document.getElementById('fin-month');
-            const reportMonthSelect = document.getElementById('report-month-select');
-            const currentMonthIdx = new Date().getMonth();
-            MONTHS_BN.forEach((m, idx) => {
-                finMonth.innerHTML += `<option value="${m}" ${idx === currentMonthIdx ? 'selected' : ''}>${m}</option>`;
-                reportMonthSelect.innerHTML += `<option value="${m}">${m}</option>`;
-            });
-
-            document.getElementById('att-date').value = new Date().toISOString().split('T')[0];
+            // ৫. জরুরি নোটিশ বোর্ড লিসেনার
+            const noticeDoc = doc(db, 'artifacts', appId, 'public', 'data', 'ijab_settings', 'notice');
+            onSnapshot(noticeDoc, (docSnap) => {
+                if (docSnap.exists()) {
+                    currentNotice = docSnap.data();
+                } else {
+                    currentNotice = null;
+                }
+                renderNoticeBanner();
+            }, (err) => console.error("Notice snapshot error:", err));
         }
 
         function updateDashboardStats() {
@@ -1053,7 +1192,7 @@
 
         // --- RENDER ORGANIZATIONAL DASHBOARD ---
         window.renderPublicDashboard = function() {
-            // 1. Admin Finance Card
+            // ১. অ্যাডমিন বায়তুলমাল কার্ড
             const adminFinCard = document.getElementById('dash-admin-finance-card');
             if (currentUser && adminFinCard) {
                 adminFinCard.classList.remove('hidden');
@@ -1071,7 +1210,7 @@
                 adminFinCard.classList.add('hidden');
             }
 
-            // 2. Blood Group Matrix
+            // ২. ব্লাড গ্রুপ ম্যাট্রিক্স
             const bloodGrid = document.getElementById('dash-blood-grid');
             if (bloodGrid) {
                 const groups = ['O+', 'A+', 'B+', 'AB+', 'O-', 'A-', 'B-', 'AB-'];
@@ -1086,7 +1225,7 @@
                 }).join('');
             }
 
-            // 3. Branch-wise Strength List
+            // ৩. শাখাভিত্তিক জনশক্তি চিত্র
             const branchList = document.getElementById('dash-branch-list');
             if (branchList) {
                 const maxTotal = Math.max(1, ...UNIONS.map(u => peopleData.filter(p => p.union === u && (p.type === 'leader' || p.type === 'member')).length));
@@ -1116,7 +1255,7 @@
                 }).join('');
             }
 
-            // 4. Recent Programs
+            // ৪. সাম্প্রতিক প্রোগ্রাম
             const progList = document.getElementById('dash-recent-programs');
             if (progList) {
                 const recent = attendanceData.slice(0, 4);
@@ -1227,7 +1366,7 @@
                 if (search) {
                     const matchName = (p.name || '').toLowerCase().includes(search);
                     const matchDesig = (p.designation || '').toLowerCase().includes(search);
-                    const matchPhone = (p.phone || '').includes(search);
+                    const matchPhone = (p.phone || '').includes(toEnglishDigits(search));
                     const matchBlood = (p.bloodGroup || '').toLowerCase() === search;
                     if (!matchName && !matchDesig && !matchPhone && !matchBlood) return false;
                 }
@@ -1244,7 +1383,7 @@
             emptyState.classList.add('hidden');
 
             filtered.forEach(person => {
-                const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent(person.name.charAt(0))}`;
+                const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent((person.name || '?').charAt(0))}`;
                 const photoUrl = person.photo || defaultAvatar;
                 const cleanPhone = (person.phone || '').replace(/[^0-9]/g, '');
                 const waNumber = cleanPhone.startsWith('88') ? cleanPhone : '88' + cleanPhone;
@@ -1301,7 +1440,7 @@
             if (!person) return;
             selectedPersonForModal = person;
 
-            const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent(person.name.charAt(0))}`;
+            const defaultAvatar = `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent((person.name || '?').charAt(0))}`;
             document.getElementById('detail-photo').src = person.photo || defaultAvatar;
             document.getElementById('detail-name').innerText = person.name;
             document.getElementById('detail-designation').innerText = person.designation;
@@ -1439,7 +1578,7 @@
                 document.getElementById('person-blood').value = personToEdit.bloodGroup || '';
                 document.getElementById('person-phone').value = personToEdit.phone;
                 document.getElementById('person-fixed-iyanat').value = personToEdit.fixedIyanat || '';
-                document.getElementById('person-photo-preview').src = personToEdit.photo || `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent(personToEdit.name.charAt(0))}`;
+                document.getElementById('person-photo-preview').src = personToEdit.photo || `https://placehold.co/150x150/0f5132/ffffff?text=${encodeURIComponent((personToEdit.name || '?').charAt(0))}`;
             } else {
                 document.getElementById('person-form-title').innerText = "নতুন তথ্য যুক্ত করুন";
                 document.getElementById('person-id').value = "";
@@ -1486,7 +1625,7 @@
                 const name = document.getElementById('person-name').value.trim();
                 const designation = document.getElementById('person-designation').value.trim();
                 const bloodGroup = document.getElementById('person-blood').value;
-                const phone = document.getElementById('person-phone').value.trim();
+                const phone = toEnglishDigits(document.getElementById('person-phone').value.trim());
                 const fixedIyanat = Number(document.getElementById('person-fixed-iyanat').value || 0);
 
                 let photoUrl = id ? (peopleData.find(p => p.id === id)?.photo || '') : '';
@@ -1498,8 +1637,12 @@
                 const payload = { type, union, name, designation, bloodGroup, phone, fixedIyanat, photo: photoUrl, updatedAt: new Date().toISOString() };
 
                 if (isFirebaseReady && db) {
-                    if (id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', id), payload);
-                    else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people'), payload);
+                    if (id) {
+                        // setDoc merge ব্যবহার করায় প্রিসেট দায়িত্বশীলদের এডিট করলেও কোনো এরর আসবে না
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', id), payload, { merge: true });
+                    } else {
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people'), payload);
+                    }
                 } else {
                     if (id) {
                         const idx = peopleData.findIndex(p => p.id === id);
@@ -1508,12 +1651,14 @@
                         peopleData.push({ id: 'local_' + Date.now(), ...payload });
                     }
                     updateDashboardStats();
+                    renderPublicDashboard();
                     renderPeopleList();
                 }
 
                 closeModal('person-form-modal');
                 showToast('তথ্য সফলভাবে সংরক্ষিত হয়েছে!', 'success');
             } catch (err) {
+                console.error(err);
                 showToast('সংরক্ষণ করতে সমস্যা হয়েছে!', 'error');
             } finally {
                 btn.disabled = false;
@@ -1524,12 +1669,13 @@
         function confirmDeletePerson(person) {
             showConfirmModal("তথ্য মুছে ফেলুন", `আপনি কি নিশ্চিতভাবে "${person.name}"-এর তথ্য মুছে ফেলতে চান?`, async () => {
                 try {
-                    if (isFirebaseReady && db) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', person.id));
-                    else {
-                        peopleData = peopleData.filter(p => p.id !== person.id);
-                        updateDashboardStats();
-                        renderPeopleList();
+                    if (isFirebaseReady && db) {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ijab_people', person.id));
                     }
+                    peopleData = peopleData.filter(p => p.id !== person.id);
+                    updateDashboardStats();
+                    renderPublicDashboard();
+                    renderPeopleList();
                     closeModal('person-detail-modal');
                     showToast('তথ্য মুছে ফেলা হয়েছে।', 'info');
                 } catch (e) { showToast('মুছতে সমস্যা হয়েছে!', 'error'); }
@@ -1613,6 +1759,7 @@
                 } else {
                     attendanceData.unshift({ id: 'att_' + Date.now(), ...payload });
                     renderAttendanceHistory();
+                    renderPublicDashboard();
                 }
                 document.getElementById('att-program-name').value = '';
                 toggleAllAttendance(false);
@@ -1695,6 +1842,7 @@
                     else {
                         attendanceData = attendanceData.filter(a => a.id !== attId);
                         renderAttendanceHistory();
+                        renderPublicDashboard();
                     }
                     showToast('হাজিরা মুছে ফেলা হয়েছে।', 'info');
                 } catch (e) { showToast('মুছতে সমস্যা হয়েছে!', 'error'); }
@@ -1863,6 +2011,7 @@
                         financeData.unshift({ id: 'tx_' + Date.now(), ...payload });
                     }
                     renderFinance();
+                    renderPublicDashboard();
                 }
 
                 closeModal('finance-form-modal');
@@ -1962,6 +2111,7 @@
                     else {
                         financeData = financeData.filter(f => f.id !== txId);
                         renderFinance();
+                        renderPublicDashboard();
                     }
                     showToast('লেনদেন মুছে ফেলা হয়েছে।', 'info');
                 } catch (e) { showToast('মুছতে সমস্যা হয়েছে!', 'error'); }
@@ -2278,11 +2428,12 @@
 
         window.handleAdminLogin = function(event) {
             event.preventDefault();
-            const phone = document.getElementById('login-phone').value.trim();
-            const pin = document.getElementById('login-pin').value.trim();
+            const phone = toEnglishDigits(document.getElementById('login-phone').value.trim());
+            const pin = toEnglishDigits(document.getElementById('login-pin').value.trim());
             const matched = adminsData.find(a => a.phone === phone && a.pin === pin);
             if (!matched) { showToast('মোবাইল নম্বর অথবা পিন ভুল হয়েছে!', 'error'); return; }
             currentUser = matched;
+            try { localStorage.setItem('ijab_current_admin', JSON.stringify(matched)); } catch (e) {}
             closeModal('login-modal');
             updateUIForAdmin();
             showToast(`স্বাগতম, ${matched.name}!`, 'success');
@@ -2290,6 +2441,7 @@
 
         window.logoutAdmin = function() {
             currentUser = null;
+            try { localStorage.removeItem('ijab_current_admin'); } catch (e) {}
             updateUIForAdmin();
             switchTab('dashboard');
             showToast('লগআউট সম্পন্ন হয়েছে।', 'info');
@@ -2395,8 +2547,8 @@
             event.preventDefault();
             const name = document.getElementById('new-admin-name').value.trim();
             const union = document.getElementById('new-admin-union').value;
-            const phone = document.getElementById('new-admin-phone').value.trim();
-            const pin = document.getElementById('new-admin-pin').value.trim();
+            const phone = toEnglishDigits(document.getElementById('new-admin-phone').value.trim());
+            const pin = toEnglishDigits(document.getElementById('new-admin-pin').value.trim());
 
             if (adminsData.some(a => a.phone === phone)) { showToast('এই মোবাইল নম্বরটি ইতিমধ্যে অ্যাডমিন হিসেবে যুক্ত আছে!', 'error'); return; }
 
