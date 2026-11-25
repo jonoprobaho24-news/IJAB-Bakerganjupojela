@@ -55,7 +55,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Notice Marquee Animation */
         @keyframes noticeMarquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -71,7 +70,6 @@
             animation-play-state: paused;
         }
 
-        /* Print Styles for Official Financial Report */
         @media print {
             @page { size: A4 portrait; margin: 12mm; }
             body * { visibility: hidden; }
@@ -127,7 +125,7 @@
                 <button id="btn-install-app" onclick="triggerInstallApp()" class="hidden text-primary-dark bg-amber-300 hover:bg-amber-400 transition px-3 py-2 text-xs sm:text-sm rounded-xl font-extrabold shadow-md flex items-center gap-1.5 animate-pulse" title="অ্যাপ ইনস্টল করুন">
                     <i class="fas fa-download"></i> <span>ইনস্টল</span>
                 </button>
-                <button id="btn-login-open" onclick="openLoginModal()" class="bg-white/15 hover:bg-white/25 text-white px-3.5 py-2 text-xs sm:text-sm rounded-xl font-semibold transition flex items-center gap-1.5 border border-white/20 shadow-sm">
+                <button type="button" id="btn-login-open" onclick="openLoginModal()" class="bg-white/15 hover:bg-white/25 text-white px-3.5 py-2 text-xs sm:text-sm rounded-xl font-semibold transition flex items-center gap-1.5 border border-white/20 shadow-sm">
                     <i class="fas fa-user-shield text-amber-300"></i> <span>লগইন</span>
                 </button>
 
@@ -158,7 +156,7 @@
                 আদর্শবান যুবকরা জাগলেই জাগবে বাংলাদেশ
             </h2>
             <p class="text-xs sm:text-sm text-green-100/90 mt-1 max-w-xl mx-auto">
-                বাকেরগঞ্জ উপজেলা ও অধীনস্থ ১০টি সাংগঠনিক শাখার দায়িত্বশীল, সদস্য, রক্তদাতা ও বায়তুলমাল ব্যবস্থাপনা
+                বাকেরগঞ্জ উপজেলা, অধীনস্থ ১০টি সাংগঠনিক শাখা ও ওয়ার্ড কমিটির দায়িত্বশীল, সদস্য, রক্তদাতা ও বায়তুলমাল ব্যবস্থাপনা
             </p>
         </div>
     </section>
@@ -308,7 +306,6 @@
 
         <!-- VIEW 0: ORGANIZATIONAL DASHBOARD -->
         <div id="view-dashboard" class="space-y-5">
-            <!-- Admin Live Financial Snapshot -->
             <div id="dash-admin-finance-card" class="hidden bg-gradient-to-r from-emerald-900 via-primary to-emerald-800 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-emerald-700">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
@@ -334,7 +331,6 @@
                 </div>
             </div>
 
-            <!-- Blood Bank Quick Matrix -->
             <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200/80">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
@@ -346,37 +342,37 @@
                 <div id="dash-blood-grid" class="grid grid-cols-4 sm:grid-cols-8 gap-2"></div>
             </div>
 
-            <!-- Organizational Branch Ranking / Leaderboard -->
             <div class="bg-gradient-to-br from-amber-50/90 via-white to-emerald-50/70 rounded-2xl p-4 sm:p-5 shadow-sm border border-amber-200/80">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <h3 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
+                    <h3 id="ranking-section-title" class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
                         <span class="w-7 h-7 rounded-lg bg-amber-400 text-primary-dark flex items-center justify-center text-xs shadow-sm"><i class="fas fa-trophy"></i></span>
-                        সাংগঠনিক কার্যক্রম র‍্যাংকিং (সেরা শাখা নির্বাচন)
+                        সাংগঠনিক কার্যক্রম র‍্যাংকিং (ইউনিয়ন ও ওয়ার্ড পর্যায়)
                     </h3>
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <select id="dash-ranking-union-select" onchange="renderPublicDashboard()" class="px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-gray-800 font-bold text-[11px] focus:outline-none focus:ring-2 focus:ring-amber-400/50 cursor-pointer">
+                            <option value="ALL">ইউনিয়ন / পৌরসভা র‍্যাংকিং</option>
+                        </select>
                         <button type="button" onclick="copyRankingReportWA()" class="px-2.5 py-1 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[11px] shadow-sm flex items-center gap-1 transition">
                             <i class="fab fa-whatsapp"></i> রিপোর্ট কপি
                         </button>
                         <span class="text-[11px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">১০০ পয়েন্ট</span>
                     </div>
                 </div>
-                <p class="text-[11px] text-gray-600 mb-3">জনশক্তি গঠন (৩০), নিয়মিত ইয়ানত আদায় (৩০), প্রোগ্রাম ও হাজিরা (২৫) এবং রক্তদাতা ও সুধী সংযুক্তি (১৫)-এর ভিত্তিতে স্বয়ংক্রিয় র‍্যাংকিং:</p>
+                <p id="ranking-section-subtitle" class="text-[11px] text-gray-600 mb-3">জনশক্তি গঠন (৩০), নিয়মিত ইয়ানত আদায় (৩০), প্রোগ্রাম ও হাজিরা (২৫) এবং রক্তদাতা ও সুধী সংযুক্তি (১৫)-এর ভিত্তিতে স্বয়ংক্রিয় র‍্যাংকিং (নিচে যেকোনো ইউনিয়ন সিলেক্ট করলে তার ওয়ার্ড র‍্যাংকিংও দেখতে পাবেন):</p>
                 <div id="dash-ranking-list" class="space-y-2.5"></div>
             </div>
 
-            <!-- Branch-wise Strength & Progress -->
             <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200/80">
                 <div class="flex items-center justify-between mb-3.5">
                     <h3 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
                         <span class="w-7 h-7 rounded-lg bg-emerald-100 text-primary flex items-center justify-center text-xs"><i class="fas fa-sitemap"></i></span>
-                        ১০টি সাংগঠনিক শাখার জনশক্তি চিত্র
+                        ১০টি সাংগঠনিক শাখা ও ওয়ার্ড কমিটির জনশক্তি চিত্র
                     </h3>
                     <span class="text-[11px] text-gray-500">শাখায় চাপ দিয়ে সদস্য দেখুন</span>
                 </div>
                 <div id="dash-branch-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
             </div>
 
-            <!-- Recent Programs -->
             <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200/80">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
@@ -403,6 +399,21 @@
                             <option value="ALL">সকল শাখা (উপজেলা ও ইউনিয়ন)</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Cascading Ward Filter (Shows automatically when a Union or Pourashava is selected) -->
+                <div id="ward-filter-wrapper" class="hidden bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-900">
+                        <i class="fas fa-layer-group text-primary"></i>
+                        <span>কমিটির স্তর / ওয়ার্ড নির্বাচন করুন:</span>
+                    </div>
+                    <div class="relative sm:w-64">
+                        <select id="ward-filter" onchange="onWardFilterChange()" class="w-full pl-3 pr-8 py-2 bg-white border border-emerald-300 rounded-xl text-xs font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer">
+                            <option value="ALL">সকল স্তর (ইউনিয়ন + সব ওয়ার্ড)</option>
+                            <option value="UNION_MAIN">ইউনিয়ন / পৌর মূল কমিটি (১৭ সদস্য)</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
                     </div>
                 </div>
 
@@ -444,7 +455,7 @@
                     <i class="fas fa-user-slash"></i>
                 </div>
                 <h3 class="text-base font-bold text-gray-700">কোনো তথ্য পাওয়া যায়নি</h3>
-                <p class="text-xs text-gray-500 mt-1">অন্য শাখা বা ভিন্ন নাম দিয়ে অনুসন্ধান করুন।</p>
+                <p class="text-xs text-gray-500 mt-1">অন্য শাখা, ওয়ার্ড বা ভিন্ন নাম দিয়ে অনুসন্ধান করুন।</p>
             </div>
         </div>
 
@@ -454,11 +465,17 @@
                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2 mb-3">
                     <i class="fas fa-clipboard-check text-primary"></i> নতুন প্রোগ্রাম / বৈঠকের হাজিরা নিন
                 </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">শাখা নির্বাচন *</label>
-                        <select id="att-union-select" onchange="loadAttendanceChecklist()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-800"></select>
+                        <select id="att-union-select" onchange="onAttUnionChange()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-800"></select>
                     </div>
+                    <div id="att-ward-box" class="hidden">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">কমিটির স্তর / ওয়ার্ড *</label>
+                        <select id="att-ward-select" onchange="loadAttendanceChecklist()" class="w-full px-3 py-2 bg-emerald-50/70 border border-emerald-200 rounded-xl text-sm font-semibold text-gray-800"></select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">প্রোগ্রাম / বৈঠকের নাম *</label>
                         <input type="text" id="att-program-name" placeholder="যেমন: মাসিক নির্বাহী বৈঠক" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm">
@@ -493,19 +510,26 @@
             </div>
         </div>
 
-        <!-- VIEW 5: FINANCE / BAITULMAL (SIMPLIFIED 2-PART SYSTEM) -->
+        <!-- VIEW 5: FINANCE / BAITULMAL -->
         <div id="view-finance" class="hidden space-y-4">
-            <!-- Top Union Filter & Report Bar -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-200/80 flex flex-wrap items-center justify-between gap-2.5">
-                <div class="flex items-center gap-2 flex-1 min-w-[180px]">
-                    <i class="fas fa-map-marker-alt text-primary"></i>
-                    <select id="finance-union-filter" onchange="renderFinance()" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800">
-                        <option value="ALL">সকল শাখা (মোট হিসাব)</option>
-                    </select>
+            <!-- Top Union & Ward Filter & Report Bar -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-200/80 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2 flex-1 min-w-[180px]">
+                        <i class="fas fa-map-marker-alt text-primary"></i>
+                        <select id="finance-union-filter" onchange="onFinanceUnionChange()" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800">
+                            <option value="ALL">সকল শাখা (মোট হিসাব)</option>
+                        </select>
+                    </div>
+                    <button onclick="openPrintReportModal()" class="bg-gray-800 hover:bg-gray-900 text-white text-xs sm:text-sm px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5" title="A4 রিপোর্ট ও প্রিন্ট">
+                        <i class="fas fa-print"></i> <span>রিপোর্ট (A4)</span>
+                    </button>
                 </div>
-                <button onclick="openPrintReportModal()" class="bg-gray-800 hover:bg-gray-900 text-white text-xs sm:text-sm px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5" title="A4 রিপোর্ট ও প্রিন্ট">
-                    <i class="fas fa-print"></i> <span>রিপোর্ট (A4)</span>
-                </button>
+                <div id="finance-ward-wrapper" class="hidden flex items-center gap-2 pt-2 border-t border-gray-100">
+                    <i class="fas fa-layer-group text-emerald-700 text-xs"></i>
+                    <span class="text-xs font-bold text-gray-600 shrink-0">স্তর / ওয়ার্ড:</span>
+                    <select id="finance-ward-filter" onchange="renderFinance()" class="flex-1 px-3 py-1.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs font-bold text-gray-800"></select>
+                </div>
             </div>
 
             <!-- Overall Balance Summary Cards -->
@@ -582,7 +606,6 @@
                         </div>
                     </div>
 
-                    <!-- Monthly Collection Mini-Stats -->
                     <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 text-center">
                         <div class="bg-emerald-50 border border-emerald-200 rounded-xl py-2 px-1">
                             <div class="text-[10px] font-bold text-emerald-700">দিয়েছেন</div>
@@ -599,7 +622,6 @@
                     </div>
                 </div>
 
-                <!-- 1-Click Collection List -->
                 <div id="collection-sheet-list" class="space-y-2"></div>
             </div>
 
@@ -638,7 +660,7 @@
     <footer class="bg-white border-t border-gray-200/80 py-4 px-4 text-center text-xs text-gray-500 mt-auto no-print">
         <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p class="font-bold text-primary">ইসলামী যুব আন্দোলন বাংলাদেশ • বাকেরগঞ্জ উপজেলা শাখা</p>
-            <p class="text-[11px] text-gray-400">ডিজিটাল সাংগঠনিক ও বায়তুলমাল ব্যবস্থাপনা পোর্টাল • v2.6</p>
+            <p class="text-[11px] text-gray-400">ডিজিটাল সাংগঠনিক ও বায়তুলমাল ব্যবস্থাপনা পোর্টাল • v3.0 (উপজেলা + ইউনিয়ন + ওয়ার্ড)</p>
         </div>
     </footer>
 
@@ -710,8 +732,8 @@
             <div class="p-4 space-y-4 max-h-[75vh] overflow-y-auto">
                 <div class="bg-gray-50 p-3 rounded-xl space-y-2 text-sm border border-gray-100">
                     <div class="flex items-center justify-between">
-                        <span class="text-gray-500 text-xs">সাংগঠনিক শাখা:</span>
-                        <span id="detail-union" class="font-bold text-gray-800 text-xs">শাখা</span>
+                        <span class="text-gray-500 text-xs">সাংগঠনিক শাখা ও স্তর:</span>
+                        <span id="detail-union" class="font-bold text-gray-800 text-xs text-right">শাখা</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-gray-500 text-xs">মোবাইল নম্বর:</span>
@@ -732,7 +754,6 @@
                     </a>
                 </div>
 
-                <!-- 12-Month Iyanat Tracker (Authorized Admin Only) -->
                 <div id="detail-iyanat-section" class="hidden border-t border-gray-200 pt-3">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-xs font-bold text-gray-700 flex items-center gap-1.5">
@@ -788,7 +809,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">ধরণ নির্বাচন করুন *</label>
-                    <select id="person-type" required onchange="onPersonTypeChange()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold">
+                    <select id="person-type" required onchange="onPersonFormScopeChange()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold">
                         <option value="leader">দায়িত্বশীল</option>
                         <option value="member">সাধারণ সদস্য</option>
                         <option value="sudhi">সুধী / শুভাকাঙ্ক্ষী</option>
@@ -796,8 +817,21 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">সাংগঠনিক শাখা (ইউনিয়ন/উপজেলা) *</label>
-                    <select id="person-union" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold"></select>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">সাংগঠনিক শাখা (উপজেলা / ইউনিয়ন / পৌরসভা) *</label>
+                    <select id="person-union" required onchange="onPersonFormScopeChange()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold"></select>
+                </div>
+
+                <div id="person-ward-box" class="hidden bg-emerald-50/80 p-3 rounded-xl border border-emerald-200">
+                    <label class="block text-xs font-bold text-emerald-950 mb-1">কমিটির স্তর / ওয়ার্ড নির্বাচন করুন *</label>
+                    <select id="person-ward" onchange="onPersonFormScopeChange()" class="w-full px-3 py-2 bg-white border border-emerald-300 rounded-xl text-sm font-bold text-gray-900">
+                        <option value="">ইউনিয়ন / পৌর মূল কমিটি (১৭ সদস্য)</option>
+                    </select>
+                    <p id="person-form-template-hint" class="text-[11px] text-emerald-800 mt-1 font-medium">অফিশিয়াল ১৭ সদস্যের ইউনিয়ন/পৌর কমিটি ফরম অনুযায়ী পদবি দেখানো হচ্ছে।</p>
+                </div>
+
+                <div id="person-upazila-hint-box" class="bg-blue-50/80 p-2.5 rounded-xl border border-blue-200 text-[11px] text-blue-900 font-medium flex items-center gap-2">
+                    <i class="fas fa-id-card-alt text-blue-700 shrink-0"></i>
+                    <span>বাকেরগঞ্জ উপজেলা শাখা — অফিশিয়াল <b>২১ সদস্যের</b> উপজেলা কমিটি ফরম অনুযায়ী পদবি নির্ধারিত।</span>
                 </div>
 
                 <div>
@@ -807,7 +841,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">পদবি / পেশা *</label>
+                        <label id="person-designation-label" class="block text-xs font-bold text-gray-700 mb-1">পদবি (উপজেলা ২১ সদস্য) *</label>
                         <select id="person-designation-select" onchange="onDesignationSelectChange()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold"></select>
                         <input type="text" id="person-designation-custom" placeholder="পদবি বা পেশা লিখুন..." class="hidden w-full mt-2 px-3 py-2 bg-white border border-primary/40 rounded-xl text-sm">
                     </div>
@@ -869,7 +903,12 @@
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">সাংগঠনিক শাখা *</label>
-                    <select id="fin-union" required onchange="populateMemberDropdownForIyanat()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold"></select>
+                    <select id="fin-union" required onchange="onFinUnionChange()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold"></select>
+                </div>
+
+                <div id="fin-ward-box" class="hidden">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">স্তর / ওয়ার্ড (ঐচ্ছিক)</label>
+                    <select id="fin-ward" onchange="populateMemberDropdownForIyanat()" class="w-full px-3 py-2 bg-emerald-50/60 border border-emerald-200 rounded-xl text-sm font-semibold"></select>
                 </div>
 
                 <div id="fin-category-box">
@@ -958,10 +997,14 @@
                 </div>
             </div>
 
-            <div class="bg-gray-100 p-3 border-b border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-2 no-print">
+            <div class="bg-gray-100 p-3 border-b border-gray-200 grid grid-cols-2 sm:grid-cols-5 gap-2 no-print">
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 mb-0.5">শাখা নির্বাচন</label>
-                    <select id="report-union-select" onchange="generatePrintableReport()" class="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-800"></select>
+                    <select id="report-union-select" onchange="onReportUnionChange()" class="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-800"></select>
+                </div>
+                <div id="report-ward-box" class="hidden">
+                    <label class="block text-[11px] font-bold text-gray-600 mb-0.5">স্তর / ওয়ার্ড</label>
+                    <select id="report-ward-select" onchange="generatePrintableReport()" class="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-800"></select>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 mb-0.5">মাস নির্বাচন</label>
@@ -1019,7 +1062,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">নোটিশ / প্রোগ্রামের শিরোনাম *</label>
-                    <input type="text" id="notice-input-title" required placeholder="যেমন: ইউনিয়ন মাসিক নির্বাহী বৈঠক" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold">
+                    <input type="text" id="notice-input-title" required placeholder="যেমন: ইউনিয়ন ও ওয়ার্ড মাসিক নির্বাহী বৈঠক" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">তারিখ ও স্থান</label>
@@ -1059,7 +1102,7 @@
                     <label class="block text-xs font-bold text-gray-700 mb-1">গোপন পিন (PIN)</label>
                     <input type="text" id="admin-login-pin" placeholder="12345" class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold tracking-widest">
                 </div>
-                <button type="button" onclick="handleAdminLogin()" class="w-full py-2.5 bg-primary hover:bg-primary-light text-white rounded-xl font-bold text-sm transition shadow-md">লগইন করুন</button>
+                <button type="button" onclick="handleAdminLogin(event)" class="w-full py-2.5 bg-primary hover:bg-primary-light text-white rounded-xl font-bold text-sm transition shadow-md">লগইন করুন</button>
                 <p id="login-status-msg" class="text-xs text-center font-semibold text-red-600 min-h-[16px]"></p>
             </div>
         </div>
@@ -1075,7 +1118,6 @@
                 </button>
             </div>
             <div class="p-4 space-y-5 max-h-[82vh] overflow-y-auto">
-                <!-- Union Performance Table -->
                 <div>
                     <h4 class="text-xs font-bold text-gray-800 uppercase mb-2 flex items-center gap-1.5">
                         <i class="fas fa-chart-bar text-primary"></i> শাখাভিত্তিক পারফরম্যান্স ও তহবিল ড্যাশবোর্ড
@@ -1096,7 +1138,6 @@
                     </div>
                 </div>
 
-                <!-- Data Backup & Export -->
                 <div class="bg-blue-50 p-3.5 rounded-xl border border-blue-200">
                     <h4 class="text-xs font-bold text-blue-900 mb-2 flex items-center gap-1.5">
                         <i class="fas fa-database"></i> ডাটা ব্যাকআপ ও এক্সেল এক্সপোর্ট
@@ -1111,11 +1152,10 @@
                     </div>
                 </div>
 
-                <!-- Designation & Serial Order Manager -->
                 <div class="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                            <i class="fas fa-sort-numeric-down text-primary"></i> দায়িত্বশীল পদবি ও সিরিয়াল নিয়ন্ত্রণ
+                            <i class="fas fa-sort-numeric-down text-primary"></i> উপজেলা পদবি সিরিয়াল নিয়ন্ত্রণ
                         </h4>
                         <button type="button" onclick="resetDesignationsToDefault()" class="text-[10px] font-bold text-red-600 hover:underline">ডিফল্ট রিসেট</button>
                     </div>
@@ -1128,7 +1168,6 @@
                     <div id="designation-settings-list" class="max-h-48 overflow-y-auto space-y-1.5 pr-1"></div>
                 </div>
 
-                <!-- Diagnostic & Auto-Fix Tool for Missing General Secretaries -->
                 <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-300">
                     <div class="flex items-center justify-between mb-1.5">
                         <h4 class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
@@ -1142,7 +1181,6 @@
                     <div id="secretary-diagnostic-list" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
                 </div>
 
-                <!-- Union Admin Management -->
                 <div class="border-t border-gray-200 pt-3">
                     <h4 class="text-xs font-bold text-gray-800 uppercase mb-2">নতুন ইউনিয়ন অ্যাডমিন যুক্ত করুন</h4>
                     <form onsubmit="addUnionAdmin(event)" class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2.5 mb-3">
@@ -1176,16 +1214,72 @@
             "নিয়ামতি ইউনিয়ন", "বোয়ালিয়া সাংগঠনিক ইউনিয়ন"
         ];
 
+        const WARDS = [
+            "১নং ওয়ার্ড", "২নং ওয়ার্ড", "৩নং ওয়ার্ড", "৪নং ওয়ার্ড", "৫নং ওয়ার্ড",
+            "৬নং ওয়ার্ড", "৭নং ওয়ার্ড", "৮নং ওয়ার্ড", "৯নং ওয়ার্ড"
+        ];
+
+        // ১. উপজেলা কমিটির অফিশিয়াল পদবিক্রম (২১ সদস্য)
         const DEFAULT_LEADER_DESIGNATIONS = [
-            "সভাপতি", "সহ-সভাপতি", "সাধারণ সম্পাদক", "যুগ্ম সাধারণ সম্পাদক",
-            "সাংগঠনিক সম্পাদক", "সাংগঠনিক সম্পাদক (২)", "দফতর সম্পাদক", "প্রশিক্ষণ সম্পাদক",
-            "দাওয়া সম্পাদক", "প্রচার সম্পাদক", "প্রকাশনা সম্পাদক", "অর্থ সম্পাদক",
-            "যুব উন্নয়ন সম্পাদক", "কর্মসংস্থান সম্পাদক", "শিক্ষা ও সংস্কৃতি সম্পাদক",
-            "বিজ্ঞান ও প্রযুক্তি সম্পাদক", "তথ্য ও গবেষণা সম্পাদক", "ত্রাণ ও সমাজকল্যাণ সম্পাদক",
-            "স্বাস্থ্য ও পরিবেশ সম্পাদক", "মহিলা ও পরিবার কল্যাণ সম্পাদক",
-            "উপ-সম্পাদক", "উপ-সম্পাদক (২)"
+            "সভাপতি",
+            "সহ-সভাপতি",
+            "সাধারণ সম্পাদক",
+            "যুগ্ম সাধারণ সম্পাদক",
+            "সাংগঠনিক সম্পাদক",
+            "সাংগঠনিক সম্পাদক (২)",
+            "দফতর সম্পাদক",
+            "প্রশিক্ষণ সম্পাদক",
+            "দাওয়া সম্পাদক",
+            "প্রচার সম্পাদক",
+            "প্রকাশনা সম্পাদক",
+            "অর্থ সম্পাদক",
+            "যুব উন্নয়ন সম্পাদক",
+            "কর্মসংস্থান সম্পাদক",
+            "শিক্ষা ও সংস্কৃতি সম্পাদক",
+            "বিজ্ঞান ও প্রযুক্তি সম্পাদক",
+            "তথ্য ও গবেষণা সম্পাদক",
+            "ত্রাণ ও সমাজকল্যাণ সম্পাদক",
+            "স্বাস্থ্য ও পরিবেশ সম্পাদক",
+            "উপ-সম্পাদক",
+            "উপ-সম্পাদক (২)"
         ];
         let LEADER_DESIGNATIONS = [...DEFAULT_LEADER_DESIGNATIONS];
+
+        // ২. পৌরসভা ও ইউনিয়ন কমিটির অফিশিয়াল পদবিক্রম (ছবি-১ অনুযায়ী ঠিক ১৭ সদস্য)
+        const UNION_LEADER_DESIGNATIONS = [
+            "সভাপতি",
+            "সহ-সভাপতি",
+            "সাধারণ সম্পাদক",
+            "যুগ্ম সাধারণ সম্পাদক",
+            "সাংগঠনিক সম্পাদক",
+            "দফতর সম্পাদক",
+            "প্রচার সম্পাদক",
+            "প্রকাশনা সম্পাদক",
+            "অর্থ সম্পাদক",
+            "দাওয়াহ ও প্রশিক্ষণ সম্পাদক",
+            "যুব উন্নয়ন ও কর্মসংস্থান সম্পাদক",
+            "শিক্ষা ও সংস্কৃতি সম্পাদক",
+            "ত্রাণ ও সমাজকল্যাণ সম্পাদক",
+            "স্বাস্থ্য ও পরিবেশ সম্পাদক",
+            "উপ-সম্পাদক",
+            "উপ-সম্পাদক (২)",
+            "উপ-সম্পাদক (৩)"
+        ];
+
+        // ৩. ইউপি ও পৌর ওয়ার্ড কমিটির অফিশিয়াল পদবিক্রম (ছবি-২ অনুযায়ী ঠিক ১১ সদস্য)
+        const WARD_LEADER_DESIGNATIONS = [
+            "সভাপতি",
+            "সহ-সভাপতি",
+            "সাধারণ সম্পাদক",
+            "যুগ্ম সাধারণ সম্পাদক",
+            "সাংগঠনিক সম্পাদক",
+            "দফতর ও প্রকাশনা সম্পাদক",
+            "অর্থ সম্পাদক",
+            "প্রচার সম্পাদক",
+            "দাওয়াহ ও প্রশিক্ষণ সম্পাদক",
+            "যুব উন্নয়ন ও কর্মসংস্থান সম্পাদক",
+            "ত্রাণ ও সমাজকল্যাণ সম্পাদক"
+        ];
 
         const MONTHS_BN = [
             "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
@@ -1193,32 +1287,27 @@
         ];
 
         const UPAZILA_LEADERS_PRESET = [
-            { id: 'upz_1', type: 'leader', name: 'মাওলানা মুহাঃ জাহিদ রায়হান', designation: 'সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01787265892', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_2', type: 'leader', name: 'আর কে খলিফা রাকিব', designation: 'সহ-সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01955144533', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_3', type: 'leader', name: 'মাওলানা গাজী সাইফুল ইসলাম', designation: 'সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01611110439', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_4', type: 'leader', name: 'মাওঃ মুহাঃ মেহেদী হাসান চৌধুরী', designation: 'যুগ্ম সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01716834335', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_5', type: 'leader', name: 'মাওঃ মুহাঃ মুস্তাকিম বিল্লাহ', designation: 'সাংগঠনিক সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01861041404', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_6', type: 'leader', name: 'মুহাম্মাদ মিরন হাওলাদার', designation: 'সাংগঠনিক সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01728153601', bloodGroup: '', fixedIyanat: 0, serialOrder: 2, photo: '' },
-            { id: 'upz_7', type: 'leader', name: 'মুহাঃ ফেরদাউস আলম কামাল', designation: 'দফতর সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01722595928', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_8', type: 'leader', name: 'মাওলানা মুহাঃ রফিকুল ইসলাম বোখারী', designation: 'প্রশিক্ষণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01714520148', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_9', type: 'leader', name: 'ক্বারী মাজহারুল ইসলাম মাজহারি', designation: 'দাওয়া সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01731456285', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_10', type: 'leader', name: 'মুহাঃ মেনান বিশ্বাস', designation: 'প্রচার সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01818111495', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_11', type: 'leader', name: 'মাওলানা মুহাঃ রবিউল ইসলাম', designation: 'প্রকাশনা সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01712435185', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_12', type: 'leader', name: 'মুহাঃ আসাদুজ্জামান', designation: 'অর্থ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01728673322', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_13', type: 'leader', name: 'মুহাঃ রফিকুল ইসলাম', designation: 'যুব উন্নয়ন সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01879149237', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_14', type: 'leader', name: 'মুহাঃ নাসিরুদ্দিন', designation: 'কর্মসংস্থান সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01715233240', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_15', type: 'leader', name: 'মুহাঃ নাহিদ হাসান', designation: 'শিক্ষা ও সংস্কৃতি সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01782444063', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_16', type: 'leader', name: 'এইচ এম সালাউদ্দিন মাসরুর', designation: 'বিজ্ঞান ও প্রযুক্তি সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01718823036', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_17', type: 'leader', name: 'মুহাঃ সৌরভ হাওলাদার', designation: 'তথ্য ও গবেষণা সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01772951745', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_18', type: 'leader', name: 'মুহাঃ রেজাউল করিম', designation: 'ত্রাণ ও সমাজকল্যাণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01781674467', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_19', type: 'leader', name: 'মুফতী মুহাঃ সাব্বির আহম্মেদ', designation: 'স্বাস্থ্য ও পরিবেশ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01670572001', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_20', type: 'leader', name: 'হাফেজ নাঈমুর রহমান', designation: 'উপ-সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01319823336', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
-            { id: 'upz_21', type: 'leader', name: 'আব্দুল্লাহ আননোমান', designation: 'উপ-সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', phone: '01878984866', bloodGroup: '', fixedIyanat: 0, serialOrder: 2, photo: '' }
-        ];
-
-        const DEFAULT_ADMINS = [
-            { id: "master1", name: "মাস্টার অ্যাডমিন (উপজেলা)", phone: "01787265892", pin: "12345", role: "super", union: "ALL" },
-            { id: "master2", name: "সহ-মাস্টার অ্যাডমিন", phone: "01744432350", pin: "12345", role: "super", union: "ALL" }
+            { id: 'upz_1', type: 'leader', name: 'মাওলানা মুহাঃ জাহিদ রায়হান', designation: 'সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01787265892', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_2', type: 'leader', name: 'আর কে খলিফা রাকিব', designation: 'সহ-সভাপতি', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01955144533', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_3', type: 'leader', name: 'মাওলানা গাজী সাইফুল ইসলাম', designation: 'সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01611110439', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_4', type: 'leader', name: 'মাওঃ মুহাঃ মেহেদী হাসান চৌধুরী', designation: 'যুগ্ম সাধারণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01716834335', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_5', type: 'leader', name: 'মাওঃ মুহাঃ মুস্তাকিম বিল্লাহ', designation: 'সাংগঠনিক সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01861041404', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_6', type: 'leader', name: 'মুহাম্মাদ মিরন হাওলাদার', designation: 'সাংগঠনিক সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01728153601', bloodGroup: '', fixedIyanat: 0, serialOrder: 2, photo: '' },
+            { id: 'upz_7', type: 'leader', name: 'মুহাঃ ফেরদাউস আলম কামাল', designation: 'দফতর সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01722595928', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_8', type: 'leader', name: 'মাওলানা মুহাঃ রফিকুল ইসলাম বোখারী', designation: 'প্রশিক্ষণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01714520148', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_9', type: 'leader', name: 'ক্বারী মাজহারুল ইসলাম মাজহারি', designation: 'দাওয়া সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01731456285', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_10', type: 'leader', name: 'মুহাঃ মেনান বিশ্বাস', designation: 'প্রচার সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01818111495', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_11', type: 'leader', name: 'মাওলানা মুহাঃ রবিউল ইসলাম', designation: 'প্রকাশনা সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01712435185', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_12', type: 'leader', name: 'মুহাঃ আসাদুজ্জামান', designation: 'অর্থ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01728673322', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_13', type: 'leader', name: 'মুহাঃ রফিকুল ইসলাম', designation: 'যুব উন্নয়ন সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01879149237', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_14', type: 'leader', name: 'মুহাঃ নাসিরুদ্দিন', designation: 'কর্মসংস্থান সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01715233240', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_15', type: 'leader', name: 'মুহাঃ নাহিদ হাসান', designation: 'শিক্ষা ও সংস্কৃতি সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01782444063', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_16', type: 'leader', name: 'এইচ এম সালাউদ্দিন মাসরুর', designation: 'বিজ্ঞান ও প্রযুক্তি সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01718823036', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_17', type: 'leader', name: 'মুহাঃ সৌরভ হাওলাদার', designation: 'তথ্য ও গবেষণা সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01772951745', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_18', type: 'leader', name: 'মুহাঃ রেজাউল করিম', designation: 'ত্রাণ ও সমাজকল্যাণ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01781674467', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_19', type: 'leader', name: 'মুফতী মুহাঃ সাব্বির আহম্মেদ', designation: 'স্বাস্থ্য ও পরিবেশ সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01670572001', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_20', type: 'leader', name: 'হাফেজ নাঈমুর রহমান', designation: 'উপ-সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01319823336', bloodGroup: '', fixedIyanat: 0, serialOrder: 1, photo: '' },
+            { id: 'upz_21', type: 'leader', name: 'আব্দুল্লাহ আননোমান', designation: 'উপ-সম্পাদক', union: 'বাকেরগঞ্জ উপজেলা শাখা', ward: '', phone: '01878984866', bloodGroup: '', fixedIyanat: 0, serialOrder: 2, photo: '' }
         ];
 
         const IMGBB_API_KEY = "83d9e310c0816f055a8d15e6bf44a1f2";
@@ -1244,6 +1333,11 @@
         let legacyTxDocs = [];
         let financeData = [];
 
+        const DEFAULT_ADMINS = [
+            { id: 'master1', name: 'মাওলানা মুহাঃ জাহিদ রায়হান', phone: '01787265892', pin: '12345', role: 'super', union: 'ALL' },
+            { id: 'master2', name: 'মাওলানা গাজী সাইফুল ইসলাম', phone: '01611110439', pin: '12345', role: 'super', union: 'ALL' }
+        ];
+
         let attendanceData = [];
         let adminsData = [...DEFAULT_ADMINS];
         let noticesByUnion = {};
@@ -1254,6 +1348,18 @@
         let currentLedgerFilter = 'ALL';
         let selectedPersonForModal = null;
         let selectedPhotoBase64 = null;
+
+        function isUnionOrPourashava(unionName) {
+            return Boolean(unionName && unionName !== 'ALL' && unionName !== 'বাকেরগঞ্জ উপজেলা শাখা');
+        }
+
+        function formatScopeLabel(unionName, wardName) {
+            if (!unionName || unionName === 'ALL') return 'সকল শাখা';
+            if (isUnionOrPourashava(unionName) && wardName) {
+                return `${unionName} • ${wardName}`;
+            }
+            return unionName;
+        }
 
         function saveSessionUser(userObj) {
             try {
@@ -1349,20 +1455,27 @@
                 .trim();
         }
 
-        function getLeaderDesignationRank(designation) {
+        // =========================================================================
+        // ১. উপজেলা কমিটির আলাদা পদবি ফাংশন ও সিরিয়াল (২১ সদস্য)
+        // =========================================================================
+        function getUpazilaDesignationList() {
+            return [...LEADER_DESIGNATIONS];
+        }
+
+        function getUpazilaDesignationRank(designation) {
             const target = normalizeDesignationKey(designation)
                 .replace(/[-–—]/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
             if (!target) return 999;
 
-            if (target.includes('উপ সম্পাদক') && target.includes('২')) return 22;
-            if (target.includes('উপ সম্পাদক')) return 21;
-            if (target.includes('নির্বাহী সদস্য')) return 23;
-            if (target.includes('মহিলা') || target.includes('পরিবার কল্যাণ')) return 20;
+            if (target.includes('উপ সম্পাদক') && target.includes('২')) return 21;
+            if (target.includes('উপ সম্পাদক')) return 20;
+            if (target.includes('নির্বাহী সদস্য')) return 22;
 
-            for (let i = 0; i < LEADER_DESIGNATIONS.length; i++) {
-                const itemNorm = normalizeDesignationKey(LEADER_DESIGNATIONS[i])
+            const upzList = getUpazilaDesignationList();
+            for (let i = 0; i < upzList.length; i++) {
+                const itemNorm = normalizeDesignationKey(upzList[i])
                     .replace(/[-–—]/g, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
@@ -1388,15 +1501,91 @@
             if (target.includes('তথ্য ও গবেষণা')) return 17;
             if (target.includes('ত্রাণ ও সমাজকল্যাণ')) return 18;
             if (target.includes('স্বাস্থ্য ও পরিবেশ')) return 19;
-            if (target.includes('মহিলা ও পরিবার')) return 20;
-            if (target.includes('সম্পাদক') || target.includes('সম্পাদ')) return 20;
+            if (target.includes('সম্পাদক') || target.includes('সম্পাদ')) return 19;
 
             return 999;
         }
 
+        // =========================================================================
+        // ২. ইউনিয়ন / পৌরসভা মূল কমিটির আলাদা পদবি ফাংশন ও সিরিয়াল (১৭ সদস্য)
+        // =========================================================================
+        function getUnionDesignationList() {
+            return [...UNION_LEADER_DESIGNATIONS];
+        }
+
+        function getUnionDesignationRank(designation) {
+            const target = normalizeDesignationKey(designation)
+                .replace(/[-–—]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!target) return 999;
+
+            if (target === 'সভাপতি' || (target.includes('সভাপতি') && !target.includes('সহ'))) return 1;
+            if (target.includes('সহ সভাপতি')) return 2;
+            if (target.includes('যুগ্ম সাধারণ')) return 4;
+            if (target.includes('সাধারণ সম্পাদক')) return 3;
+            if (target.includes('সাংগঠনিক')) return 5;
+            if (target.includes('দফতর')) return 6;
+            if (target.includes('প্রচার')) return 7;
+            if (target.includes('প্রকাশনা')) return 8;
+            if (target.includes('অর্থ')) return 9;
+            if (target.includes('দাওয়া') || target.includes('প্রশিক্ষণ')) return 10;
+            if (target.includes('যুব উন্নয়ন') || target.includes('কর্মসংস্থান')) return 11;
+            if (target.includes('শিক্ষা') || target.includes('সংস্কৃতি')) return 12;
+            if (target.includes('ত্রাণ') || target.includes('সমাজকল্যাণ')) return 13;
+            if (target.includes('স্বাস্থ্য') || target.includes('পরিবেশ')) return 14;
+            if (target.includes('উপ সম্পাদক') && target.includes('৩')) return 17;
+            if (target.includes('উপ সম্পাদক') && target.includes('২')) return 16;
+            if (target.includes('উপ সম্পাদক')) return 15;
+            return 99;
+        }
+
+        // =========================================================================
+        // ৩. ওয়ার্ড কমিটির আলাদা পদবি ফাংশন ও সিরিয়াল (১১ সদস্য)
+        // =========================================================================
+        function getWardDesignationList() {
+            return [...WARD_LEADER_DESIGNATIONS];
+        }
+
+        function getWardDesignationRank(designation) {
+            const target = normalizeDesignationKey(designation)
+                .replace(/[-–—]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!target) return 999;
+
+            if (target === 'সভাপতি' || (target.includes('সভাপতি') && !target.includes('সহ'))) return 1;
+            if (target.includes('সহ সভাপতি')) return 2;
+            if (target.includes('যুগ্ম সাধারণ')) return 4;
+            if (target.includes('সাধারণ সম্পাদক')) return 3;
+            if (target.includes('সাংগঠনিক')) return 5;
+            if (target.includes('দফতর') || target.includes('প্রকাশনা')) return 6;
+            if (target.includes('অর্থ')) return 7;
+            if (target.includes('প্রচার')) return 8;
+            if (target.includes('দাওয়া') || target.includes('প্রশিক্ষণ')) return 9;
+            if (target.includes('যুব উন্নয়ন') || target.includes('কর্মসংস্থান')) return 10;
+            if (target.includes('ত্রাণ') || target.includes('সমাজকল্যাণ')) return 11;
+            return 99;
+        }
+
+        // স্তর অনুযায়ী সিরিয়াল র‍্যাংক ডিসপ্যাচার
+        function getLeaderDesignationRank(designation, unionName = '', wardName = '') {
+            if (isUnionOrPourashava(unionName) && wardName) {
+                return getWardDesignationRank(designation);
+            }
+            if (isUnionOrPourashava(unionName) && !wardName) {
+                return getUnionDesignationRank(designation);
+            }
+            return getUpazilaDesignationRank(designation);
+        }
+
         function compareLeadersByHierarchy(a, b) {
-            const rA = getLeaderDesignationRank(a.designation);
-            const rB = getLeaderDesignationRank(b.designation);
+            const wA = a.ward ? WARDS.indexOf(a.ward) + 1 : 0;
+            const wB = b.ward ? WARDS.indexOf(b.ward) + 1 : 0;
+            if (a.union === b.union && wA !== wB) return wA - wB;
+
+            const rA = getLeaderDesignationRank(a.designation, a.union, a.ward || '');
+            const rB = getLeaderDesignationRank(b.designation, b.union, b.ward || '');
             if (rA !== rB) return rA - rB;
 
             const sA = Number(a.serialOrder || 999);
@@ -1456,7 +1645,8 @@
             function upsertPerson(item) {
                 const p = normalizePhone(item.phone);
                 const u = normalizeUnionName(item.union);
-                const key = p ? `${p}_${u}` : '';
+                const w = item.ward || '';
+                const key = p ? `${p}_${u}_${w}` : '';
                 if (key && byPhoneAndUnion.has(key)) {
                     const existing = byPhoneAndUnion.get(key);
                     if (!existing.photo && item.photo) existing.photo = item.photo;
@@ -1478,6 +1668,7 @@
                 upsertPerson({
                     ...p,
                     union: normalizeUnionName(p.union),
+                    ward: p.ward || '',
                     photo: p.photo || p.photoUrl || ''
                 });
             });
@@ -1492,6 +1683,7 @@
                     name: m.name || 'নাম নেই',
                     designation: rawDesig || 'সদস্য',
                     union: normalizeUnionName(m.union),
+                    ward: m.ward || '',
                     phone: m.phone || '',
                     bloodGroup: m.bloodGroup || '',
                     fixedIyanat: Number(m.fixedIyanat || 0),
@@ -1525,6 +1717,7 @@
                 combined.push({
                     ...f,
                     union: normalizeUnionName(f.union),
+                    ward: f.ward || '',
                     category: String(f.category || '').normalize('NFC').trim() || (f.type === 'expense' ? 'ব্যয়' : 'মাসিক ইয়ানত'),
                     month: normalizeMonthName(f.month, dateStr),
                     year: f.year || (dateStr ? dateStr.split('-')[0] : String(new Date().getFullYear())),
@@ -1541,6 +1734,7 @@
                     id: t.id,
                     type: t.type === 'expense' ? 'expense' : 'income',
                     union: normalizeUnionName(t.union),
+                    ward: t.ward || '',
                     category: String(t.category || '').normalize('NFC').trim() || (t.type === 'expense' ? 'ব্যয়' : 'মাসিক ইয়ানত'),
                     amount: Number(t.amount || 0),
                     note: t.note || t.category || '',
@@ -1632,24 +1826,48 @@
             }, () => {});
         }
 
+        function populateWardOptions(selectEl, mode = 'filter') {
+            if (!selectEl) return;
+            if (mode === 'filter') {
+                selectEl.innerHTML = `
+                    <option value="ALL">সকল স্তর (ইউনিয়ন + সব ওয়ার্ড)</option>
+                    <option value="UNION_MAIN">ইউনিয়ন / পৌর মূল কমিটি (১৭ সদস্য)</option>
+                `;
+            } else {
+                selectEl.innerHTML = `<option value="">ইউনিয়ন / পৌর মূল কমিটি (১৭ সদস্য)</option>`;
+            }
+            WARDS.forEach(w => {
+                const suffix = mode === 'form' ? ' (১১ সদস্য)' : '';
+                selectEl.innerHTML += `<option value="${w}">${w}${suffix}</option>`;
+            });
+        }
+
         function initUI() {
             const unionSelectIds = [
                 'union-filter', 'person-union', 'att-union-select',
                 'finance-union-filter', 'fin-union', 'report-union-select', 'new-admin-union',
-                'notice-input-union', 'dash-notice-union-filter'
+                'notice-input-union', 'dash-notice-union-filter', 'dash-ranking-union-select'
             ];
             unionSelectIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
-                const hasAllOption = (id === 'union-filter' || id === 'finance-union-filter' || id === 'report-union-select' || id === 'notice-input-union' || id === 'dash-notice-union-filter');
+                const hasAllOption = (id === 'union-filter' || id === 'finance-union-filter' || id === 'report-union-select' || id === 'notice-input-union' || id === 'dash-notice-union-filter' || id === 'dash-ranking-union-select');
                 const allLabel = id === 'notice-input-union'
                     ? 'সকল শাখা / উপজেলা (সাধারণ নোটিশ)'
-                    : (id === 'dash-notice-union-filter' ? 'সকল শাখার নোটিশ' : 'সকল শাখা (উপজেলা ও ইউনিয়ন)');
+                    : (id === 'dash-notice-union-filter' ? 'সকল শাখার নোটিশ' : (id === 'dash-ranking-union-select' ? 'ইউনিয়ন / পৌরসভা র‍্যাংকিং' : 'সকল শাখা (উপজেলা ও ইউনিয়ন)'));
                 el.innerHTML = hasAllOption ? `<option value="ALL">${allLabel}</option>` : '';
                 UNIONS.forEach(u => {
+                    if (id === 'dash-ranking-union-select' && u === 'বাকেরগঞ্জ উপজেলা শাখা') return;
                     el.innerHTML += `<option value="${u}">${u}</option>`;
                 });
             });
+
+            populateWardOptions(document.getElementById('ward-filter'), 'filter');
+            populateWardOptions(document.getElementById('finance-ward-filter'), 'filter');
+            populateWardOptions(document.getElementById('report-ward-select'), 'filter');
+            populateWardOptions(document.getElementById('person-ward'), 'form');
+            populateWardOptions(document.getElementById('att-ward-select'), 'form');
+            populateWardOptions(document.getElementById('fin-ward'), 'form');
 
             const currentMonthIdx = new Date().getMonth();
             ['fin-month', 'col-month', 'report-month-select', 'ledger-month-filter'].forEach(id => {
@@ -1667,7 +1885,7 @@
             });
 
             document.getElementById('att-date').value = new Date().toISOString().split('T')[0];
-            populateDesignationOptions('leader');
+            populateDesignationOptions('leader', '', 'বাকেরগঞ্জ উপজেলা শাখা', '');
 
             const savedUser = loadSessionUser();
             if (savedUser && savedUser.phone) {
@@ -1681,25 +1899,47 @@
             return filterEl ? filterEl.value : 'ALL';
         }
 
-        function personMatchesUnion(person, targetUnion) {
-            if (!targetUnion || targetUnion === 'ALL') return true;
-            return person.union === targetUnion;
+        function getActiveScopeWard() {
+            const union = getActiveScopeUnion();
+            if (!isUnionOrPourashava(union)) return 'ALL';
+            const wardEl = document.getElementById('ward-filter');
+            return wardEl ? wardEl.value : 'ALL';
         }
 
-        function getPersonEffectiveDesignation(person, targetUnion) {
-            return person.designation;
+        function matchesUnionAndWard(itemUnion, itemWard, targetUnion, targetWard = 'ALL') {
+            if (targetUnion && targetUnion !== 'ALL') {
+                if (itemUnion !== targetUnion) return false;
+                if (isUnionOrPourashava(targetUnion) && targetWard && targetWard !== 'ALL') {
+                    if (targetWard === 'UNION_MAIN') return !itemWard;
+                    return (itemWard || '') === targetWard;
+                }
+            }
+            return true;
+        }
+
+        function personMatchesUnion(person, targetUnion, targetWard = 'ALL') {
+            return matchesUnionAndWard(person.union, person.ward || '', targetUnion, targetWard);
         }
 
         function updateDashboardStats() {
             const scopeUnion = getActiveScopeUnion();
-            const scopedPeople = scopeUnion === 'ALL' ? peopleData : peopleData.filter(p => personMatchesUnion(p, scopeUnion));
+            const scopeWard = getActiveScopeWard();
+            const scopedPeople = peopleData.filter(p => personMatchesUnion(p, scopeUnion, scopeWard));
 
             const leaders = scopedPeople.filter(p => p.type === 'leader').length;
             const members = scopedPeople.filter(p => p.type === 'member').length;
             const sudhi = scopedPeople.filter(p => p.type === 'sudhi').length;
             const donors = scopedPeople.filter(p => p.bloodGroup && p.bloodGroup !== '').length;
 
-            document.getElementById('hero-stat-branch').innerText = scopeUnion === 'ALL' ? '১০টি' : scopeUnion.replace(' ইউনিয়ন', '').replace('বাকেরগঞ্জ ', '');
+            let branchTitle = '১০টি';
+            if (scopeUnion !== 'ALL') {
+                const shortUnion = scopeUnion.replace(' ইউনিয়ন', '').replace('বাকেরগঞ্জ ', '');
+                if (scopeWard === 'UNION_MAIN') branchTitle = `${shortUnion} (মূল)`;
+                else if (scopeWard !== 'ALL') branchTitle = `${shortUnion} (${scopeWard})`;
+                else branchTitle = shortUnion;
+            }
+
+            document.getElementById('hero-stat-branch').innerText = branchTitle;
             document.getElementById('hero-stat-leaders').innerText = toBengaliDigits(leaders);
             document.getElementById('hero-stat-members').innerText = toBengaliDigits(members);
             document.getElementById('hero-stat-donors').innerText = toBengaliDigits(donors);
@@ -1709,7 +1949,29 @@
             document.getElementById('badge-count-sudhi').innerText = toBengaliDigits(sudhi);
         }
 
+        function syncPeopleWardVisibility() {
+            const union = getActiveScopeUnion();
+            const wrapper = document.getElementById('ward-filter-wrapper');
+            const wardSelect = document.getElementById('ward-filter');
+            if (!wrapper || !wardSelect) return;
+
+            if (isUnionOrPourashava(union)) {
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+                wardSelect.value = 'ALL';
+            }
+        }
+
         window.onUnionFilterChange = function() {
+            const wardSelect = document.getElementById('ward-filter');
+            if (wardSelect) wardSelect.value = 'ALL';
+            syncPeopleWardVisibility();
+            updateDashboardStats();
+            renderPeopleList();
+        };
+
+        window.onWardFilterChange = function() {
             updateDashboardStats();
             renderPeopleList();
         };
@@ -1719,7 +1981,7 @@
             const currentYear = String(new Date().getFullYear());
 
             return targetBranches.map(u => {
-                const branchPeople = peopleData.filter(p => personMatchesUnion(p, u));
+                const branchPeople = peopleData.filter(p => personMatchesUnion(p, u, 'ALL'));
                 const leaders = branchPeople.filter(p => p.type === 'leader');
                 const members = branchPeople.filter(p => p.type === 'member');
                 const sudhis = branchPeople.filter(p => p.type === 'sudhi');
@@ -1765,10 +2027,98 @@
             }).sort((a, b) => b.totalScore - a.totalScore || b.leadersCount - a.leadersCount);
         }
 
+        // নির্বাচিত ইউনিয়ন/পৌরসভার অধীনস্থ ১নং থেকে ৯নং ওয়ার্ডের ১০০ পয়েন্টের র‍্যাংকিং
+        function computeWardRankings(unionName) {
+            const currentYear = String(new Date().getFullYear());
+
+            return WARDS.map(w => {
+                const wardPeople = peopleData.filter(p => p.union === unionName && (p.ward || '') === w);
+                const leaders = wardPeople.filter(p => p.type === 'leader');
+                const members = wardPeople.filter(p => p.type === 'member');
+                const sudhis = wardPeople.filter(p => p.type === 'sudhi');
+                const donors = wardPeople.filter(p => p.bloodGroup && p.bloodGroup !== '');
+
+                const leaderPts = Math.min(15, (leaders.length / 8) * 15);
+                const memberPts = Math.min(15, (members.length / 15) * 15);
+                const manpowerScore = Math.round(leaderPts + memberPts);
+
+                const eligiblePayers = leaders.length + members.length;
+                const uniquePayers = new Set(
+                    financeData
+                        .filter(f => f.union === unionName && (f.ward || '') === w && f.type === 'income' && String(f.year || '') === currentYear && (String(f.category || '').includes('ইয়ানত') || String(f.category || '').includes('ইয়ানত')))
+                        .map(f => f.personId || f.personName)
+                        .filter(Boolean)
+                ).size;
+                const iyanatScore = eligiblePayers > 0 ? Math.min(30, Math.round((uniquePayers / eligiblePayers) * 30)) : 0;
+
+                const wardAtts = attendanceData.filter(a => a.union === unionName && (a.ward || '') === w);
+                const progCountPts = Math.min(15, (wardAtts.length / 3) * 15);
+                const avgAttPct = wardAtts.length > 0
+                    ? wardAtts.reduce((sum, a) => sum + (a.totalCount > 0 ? (a.presentCount / a.totalCount) : 0), 0) / wardAtts.length
+                    : 0;
+                const attScore = Math.round(progCountPts + (avgAttPct * 10));
+
+                const donorPts = Math.min(10, (donors.length / 5) * 10);
+                const sudhiPts = Math.min(5, (sudhis.length / 3) * 5);
+                const socialScore = Math.round(donorPts + sudhiPts);
+
+                const totalScore = Math.min(100, manpowerScore + iyanatScore + attScore + socialScore);
+
+                return {
+                    ward: w,
+                    union: unionName,
+                    totalScore,
+                    manpowerScore,
+                    iyanatScore,
+                    attScore,
+                    socialScore,
+                    leadersCount: leaders.length,
+                    membersCount: members.length,
+                    programsCount: wardAtts.length
+                };
+            }).sort((a, b) => b.totalScore - a.totalScore || b.leadersCount - a.leadersCount);
+        }
+
         window.copyRankingReportWA = function() {
-            const ranked = computeBranchRankings();
+            const selectedRankingUnion = document.getElementById('dash-ranking-union-select')?.value || 'ALL';
             const yearBn = toBengaliDigits(new Date().getFullYear());
             const medals = ['🥇', '🥈', '🥉'];
+
+            if (selectedRankingUnion !== 'ALL') {
+                const wardRanked = computeWardRankings(selectedRankingUnion);
+                const wardLines = wardRanked.map((item, idx) => {
+                    const prefix = idx < 3 ? medals[idx] : `${toBengaliDigits(idx + 1)}.`;
+                    return `${prefix} *${item.ward}* — *${toBengaliDigits(item.totalScore)} পয়েন্ট*\n   _(জনশক্তি: ${toBengaliDigits(item.manpowerScore)}/৩০ | ইয়ানত: ${toBengaliDigits(item.iyanatScore)}/৩০ | প্রোগ্রাম: ${toBengaliDigits(item.attScore)}/২৫ | রক্ত/সুধী: ${toBengaliDigits(item.socialScore)}/১৫)_`;
+                }).join('\n');
+
+                const wardReportText = `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+*আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ।*
+
+প্রিয় দায়িত্বশীলবৃন্দ,
+*ইসলামী যুব আন্দোলন বাংলাদেশ, ${selectedRankingUnion}*-এর অধীনস্থ ওয়ার্ডগুলোর *লাইভ র‍্যাংকিং (${yearBn})* প্রকাশ করা হলো:
+
+🏆 *ওয়ার্ড র‍্যাংকিং — ${selectedRankingUnion} (১০০ পয়েন্ট):*
+${wardLines}
+
+সকল ওয়ার্ড দায়িত্বশীলকে জনশক্তি বৃদ্ধি, ইয়ানত আদায় ও নিয়মিত প্রোগ্রামের হাজিরা অ্যাপে আপডেট করার আহ্বান জানাচ্ছি।
+
+জাযাকুমুল্লাহু খাইরান।
+— *${selectedRankingUnion}*
+ইসলামী যুব আন্দোলন বাংলাদেশ।`;
+
+                navigator.clipboard?.writeText(wardReportText).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = wardReportText;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                });
+                showToast(`${selectedRankingUnion}-এর ওয়ার্ড র‍্যাংকিং রিপোর্ট কপি হয়েছে!`, 'success');
+                return;
+            }
+
+            const ranked = computeBranchRankings();
             const rankingLines = ranked.map((item, idx) => {
                 const prefix = idx < 3 ? medals[idx] : `${toBengaliDigits(idx + 1)}.`;
                 return `${prefix} *${item.union}* — *${toBengaliDigits(item.totalScore)} পয়েন্ট*\n   _(জনশক্তি: ${toBengaliDigits(item.manpowerScore)}/৩০ | ইয়ানত: ${toBengaliDigits(item.iyanatScore)}/৩০ | প্রোগ্রাম: ${toBengaliDigits(item.attScore)}/২৫ | রক্ত/সুধী: ${toBengaliDigits(item.socialScore)}/১৫)_`;
@@ -1786,7 +2136,7 @@ ${rankingLines}
 🎖️ *বিশেষ ঘোষণা ও পুরস্কার:*
 বছর শেষে সার্বিক সাংগঠনিক কার্যক্রমে শীর্ষস্থান অর্জনকারী *সেরা শাখাসমূহকে উপজেলা শাখার পক্ষ থেকে বিশেষভাবে পুরস্কৃত ও সম্মাননা প্রদান* করা হবে, ইনশাআল্লাহ।
 
-সকল শাখার সভাপতি ও সাধারণ সম্পাদককে নিজ নিজ শাখার সদস্য বৃদ্ধি, নিয়মিত ইয়ানত আদায়, প্রোগ্রামের হাজিরা এবং রক্তদাতা ও সুধী তালিকা অ্যাপে হালনাগাদ করে এগিয়ে থাকার আহ্বান জানাচ্ছি।
+সকল শাখার সভাপতি ও সাধারণ সম্পাদককে নিজ নিজ শাখার ওয়ার্ড কমিটি গঠন, সদস্য বৃদ্ধি, নিয়মিত ইয়ানত আদায় এবং প্রোগ্রামের হাজিরা অ্যাপে হালনাগাদ করে এগিয়ে থাকার আহ্বান জানাচ্ছি।
 
 জাযাকুমুল্লাহু খাইরান।
 — *বাকেরগঞ্জ উপজেলা শাখা*
@@ -1836,91 +2186,94 @@ ${rankingLines}
             }
 
             const rankingList = document.getElementById('dash-ranking-list');
+            const rankingUnionSelect = document.getElementById('dash-ranking-union-select');
+            const rankingTitle = document.getElementById('ranking-section-title');
+            const rankingSubtitle = document.getElementById('ranking-section-subtitle');
             if (rankingList) {
-                const ranked = computeBranchRankings();
-                rankingList.innerHTML = ranked.map((item, idx) => {
-                    const rank = idx + 1;
-                    let badgeHtml = `<span class="w-7 h-7 rounded-full bg-gray-200 text-gray-700 font-extrabold text-xs flex items-center justify-center shrink-0">${toBengaliDigits(rank)}</span>`;
-                    let cardStyle = "bg-white border-gray-200";
-                    if (rank === 1) {
-                        badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-primary-dark font-extrabold text-xs flex items-center justify-center shadow shrink-0" title="১ম স্থান"><i class="fas fa-crown"></i></span>`;
-                        cardStyle = "bg-gradient-to-r from-amber-50 to-white border-amber-300 shadow-sm";
-                    } else if (rank === 2) {
-                        badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900 font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">২য়</span>`;
-                        cardStyle = "bg-slate-50/70 border-slate-300";
-                    } else if (rank === 3) {
-                        badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-200 to-amber-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">৩য়</span>`;
-                        cardStyle = "bg-orange-50/50 border-orange-200";
+                const selectedRankingUnion = rankingUnionSelect ? rankingUnionSelect.value : 'ALL';
+                if (selectedRankingUnion !== 'ALL') {
+                    if (rankingTitle) {
+                        rankingTitle.innerHTML = `<span class="w-7 h-7 rounded-lg bg-amber-400 text-primary-dark flex items-center justify-center text-xs shadow-sm"><i class="fas fa-trophy"></i></span> ওয়ার্ড র‍্যাংকিং — ${selectedRankingUnion}`;
                     }
+                    if (rankingSubtitle) {
+                        rankingSubtitle.innerText = `${selectedRankingUnion}-এর ১নং থেকে ৯নং ওয়ার্ডের জনশক্তি, ইয়ানত আদায়, প্রোগ্রাম/হাজিরা ও রক্তদাতা/সুধী কার্যক্রমের ১০০ পয়েন্ট র‍্যাংকিং (ওয়ার্ডে চাপ দিলে তালিকা খুলবে):`;
+                    }
+                    const wardRanked = computeWardRankings(selectedRankingUnion);
+                    rankingList.innerHTML = wardRanked.map((item, idx) => {
+                        const rank = idx + 1;
+                        let badgeHtml = `<span class="w-7 h-7 rounded-full bg-gray-200 text-gray-700 font-extrabold text-xs flex items-center justify-center shrink-0">${toBengaliDigits(rank)}</span>`;
+                        let cardStyle = "bg-white border-gray-200";
+                        if (rank === 1) {
+                            badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-primary-dark font-extrabold text-xs flex items-center justify-center shadow shrink-0" title="১ম স্থান"><i class="fas fa-crown"></i></span>`;
+                            cardStyle = "bg-gradient-to-r from-amber-50 to-white border-amber-300 shadow-sm";
+                        } else if (rank === 2) {
+                            badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900 font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">২য়</span>`;
+                            cardStyle = "bg-slate-50/70 border-slate-300";
+                        } else if (rank === 3) {
+                            badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-200 to-amber-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">৩য়</span>`;
+                            cardStyle = "bg-orange-50/50 border-orange-200";
+                        }
 
-                    return `
-                        <div onclick="openBranchFromDashboard('${item.union}')" class="p-3 rounded-xl border ${cardStyle} hover:border-primary/50 cursor-pointer transition">
-                            <div class="flex items-center justify-between gap-2 mb-1.5">
-                                <div class="flex items-center gap-2.5 min-w-0">
-                                    ${badgeHtml}
-                                    <div class="min-w-0">
-                                        <div class="font-bold text-xs sm:text-sm text-gray-900 truncate">${item.union}</div>
-                                        <div class="text-[10px] text-gray-500 truncate">জনশক্তি: ${toBengaliDigits(item.manpowerScore)}/৩০ • ইয়ানত: ${toBengaliDigits(item.iyanatScore)}/৩০ • প্রোগ্রাম: ${toBengaliDigits(item.attScore)}/২৫ • রক্ত/সুধী: ${toBengaliDigits(item.socialScore)}/১৫</div>
+                        return `
+                            <div onclick="openWardFromDashboard('${item.union}', '${item.ward}')" class="p-3 rounded-xl border ${cardStyle} hover:border-primary/50 cursor-pointer transition">
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        ${badgeHtml}
+                                        <div class="min-w-0">
+                                            <div class="font-bold text-xs sm:text-sm text-gray-900 truncate">${item.ward} <span class="text-[11px] font-medium text-gray-500">(${toBengaliDigits(item.leadersCount)} দায়িত্বশীল, ${toBengaliDigits(item.membersCount)} সদস্য)</span></div>
+                                            <div class="text-[10px] text-gray-500 truncate">জনশক্তি: ${toBengaliDigits(item.manpowerScore)}/৩০ • ইয়ানত: ${toBengaliDigits(item.iyanatScore)}/৩০ • প্রোগ্রাম: ${toBengaliDigits(item.attScore)}/২৫ • রক্ত/সুধী: ${toBengaliDigits(item.socialScore)}/১৫</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="inline-block px-2.5 py-1 rounded-lg bg-primary text-white font-extrabold text-xs">${toBengaliDigits(item.totalScore)} পয়েন্ট</span>
                                     </div>
                                 </div>
-                                <div class="text-right shrink-0">
-                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-primary text-white font-extrabold text-xs">${toBengaliDigits(item.totalScore)} পয়েন্ট</span>
+                                <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full ${rank === 1 ? 'bg-amber-500' : 'bg-primary'} rounded-full transition-all" style="width: ${item.totalScore}%"></div>
                                 </div>
                             </div>
-                            <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div class="h-full ${rank === 1 ? 'bg-amber-500' : 'bg-primary'} rounded-full transition-all" style="width: ${item.totalScore}%"></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            const branchList = document.getElementById('dash-branch-list');
-            if (branchList) {
-                const maxTotal = Math.max(1, ...UNIONS.map(u => peopleData.filter(p => personMatchesUnion(p, u) && (p.type === 'leader' || p.type === 'member')).length));
-                branchList.innerHTML = UNIONS.map(u => {
-                    const lCount = peopleData.filter(p => personMatchesUnion(p, u) && p.type === 'leader').length;
-                    const mCount = peopleData.filter(p => personMatchesUnion(p, u) && p.type === 'member').length;
-                    const bCount = peopleData.filter(p => personMatchesUnion(p, u) && p.bloodGroup).length;
-                    const total = lCount + mCount;
-                    const pct = Math.min(100, Math.round((total / maxTotal) * 100));
-
-                    return `
-                        <div onclick="openBranchFromDashboard('${u}')" class="p-3 rounded-xl border border-gray-200/80 hover:border-primary/50 bg-gray-50/60 hover:bg-emerald-50/40 cursor-pointer transition">
-                            <div class="flex items-center justify-between gap-2 mb-1.5">
-                                <span class="font-bold text-xs sm:text-sm text-gray-900 truncate">${u}</span>
-                                <span class="text-[11px] font-bold text-primary bg-emerald-100/80 px-2 py-0.5 rounded-full shrink-0">মোট: ${toBengaliDigits(total)} জন</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mb-2">
-                                <div class="h-full bg-primary rounded-full" style="width: ${pct}%"></div>
-                            </div>
-                            <div class="flex items-center justify-between text-[11px] text-gray-600">
-                                <span><i class="fas fa-user-tie text-primary mr-1"></i>দায়িত্বশীল: <b>${toBengaliDigits(lCount)}</b></span>
-                                <span><i class="fas fa-users text-amber-600 mr-1"></i>সদস্য: <b>${toBengaliDigits(mCount)}</b></span>
-                                <span><i class="fas fa-tint text-red-500 mr-1"></i>রক্তদাতা: <b>${toBengaliDigits(bCount)}</b></span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            const progList = document.getElementById('dash-recent-programs');
-            if (progList) {
-                const recent = attendanceData.slice(0, 4);
-                if (recent.length === 0) {
-                    progList.innerHTML = `<div class="py-4 text-center text-xs text-gray-500">সাম্প্রতিক কোনো প্রোগ্রামের রেকর্ড নেই।</div>`;
+                        `;
+                    }).join('');
                 } else {
-                    progList.innerHTML = recent.map(att => {
-                        const pct = att.totalCount > 0 ? Math.round((att.presentCount / att.totalCount) * 100) : 0;
+                    if (rankingTitle) {
+                        rankingTitle.innerHTML = `<span class="w-7 h-7 rounded-lg bg-amber-400 text-primary-dark flex items-center justify-center text-xs shadow-sm"><i class="fas fa-trophy"></i></span> সাংগঠনিক কার্যক্রম র‍্যাংকিং (সেরা শাখা নির্বাচন)`;
+                    }
+                    if (rankingSubtitle) {
+                        rankingSubtitle.innerText = "জনশক্তি গঠন (৩০), নিয়মিত ইয়ানত আদায় (৩০), প্রোগ্রাম ও হাজিরা (২৫) এবং রক্তদাতা ও সুধী সংযুক্তি (১৫)-এর ভিত্তিতে স্বয়ংক্রিয় র‍্যাংকিং:";
+                    }
+                    const ranked = computeBranchRankings();
+                    rankingList.innerHTML = ranked.map((item, idx) => {
+                        const rank = idx + 1;
+                        let badgeHtml = `<span class="w-7 h-7 rounded-full bg-gray-200 text-gray-700 font-extrabold text-xs flex items-center justify-center shrink-0">${toBengaliDigits(rank)}</span>`;
+                        let cardStyle = "bg-white border-gray-200";
+                        if (rank === 1) {
+                            badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-primary-dark font-extrabold text-xs flex items-center justify-center shadow shrink-0" title="১ম স্থান"><i class="fas fa-crown"></i></span>`;
+                            cardStyle = "bg-gradient-to-r from-amber-50 to-white border-amber-300 shadow-sm";
+                        } else if (rank === 2) {
+                            badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900 font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">২য়</span>`;
+                            cardStyle = "bg-slate-50/70 border-slate-300";
+                        } else if (rank === 3) {
+                            badgeHtml = `<span class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-200 to-amber-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">৩য়</span>`;
+                            cardStyle = "bg-orange-50/50 border-orange-200";
+                        }
+
                         return `
-                            <div class="py-2.5 flex items-center justify-between gap-2">
-                                <div class="min-w-0">
-                                    <div class="font-bold text-xs sm:text-sm text-gray-900 truncate">${att.programName}</div>
-                                    <div class="text-[11px] text-gray-500 truncate">${att.union} • ${toBengaliDigits(att.date)}</div>
+                            <div onclick="openBranchFromDashboard('${item.union}')" class="p-3 rounded-xl border ${cardStyle} hover:border-primary/50 cursor-pointer transition">
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        ${badgeHtml}
+                                        <div class="min-w-0">
+                                            <div class="font-bold text-xs sm:text-sm text-gray-900 truncate">${item.union}</div>
+                                            <div class="text-[10px] text-gray-500 truncate">জনশক্তি: ${toBengaliDigits(item.manpowerScore)}/৩০ • ইয়ানত: ${toBengaliDigits(item.iyanatScore)}/৩০ • প্রোগ্রাম: ${toBengaliDigits(item.attScore)}/২৫ • রক্ত/সুধী: ${toBengaliDigits(item.socialScore)}/১৫</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="inline-block px-2.5 py-1 rounded-lg bg-primary text-white font-extrabold text-xs">${toBengaliDigits(item.totalScore)} পয়েন্ট</span>
+                                    </div>
                                 </div>
-                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
-                                    উপস্থিতি: ${toBengaliDigits(pct)}%
-                                </span>
+                                <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full ${rank === 1 ? 'bg-amber-500' : 'bg-primary'} rounded-full transition-all" style="width: ${item.totalScore}%"></div>
+                                </div>
                             </div>
                         `;
                     }).join('');
@@ -1931,6 +2284,7 @@ ${rankingLines}
         window.openBloodFromDashboard = function(bg) {
             switchTab('leaders');
             document.getElementById('union-filter').value = 'ALL';
+            syncPeopleWardVisibility();
             updateDashboardStats();
             quickSelectBlood(bg);
         };
@@ -1938,44 +2292,66 @@ ${rankingLines}
         window.openBranchFromDashboard = function(unionName) {
             switchTab('leaders');
             document.getElementById('union-filter').value = unionName;
+            document.getElementById('ward-filter').value = 'ALL';
+            syncPeopleWardVisibility();
             updateDashboardStats();
             renderPeopleList();
         };
 
-        window.switchTab = function(tab) {
-            currentTab = tab;
-            ['dashboard', 'leaders', 'members', 'sudhi', 'attendance', 'finance'].forEach(t => {
+        window.openWardFromDashboard = function(unionName, wardName) {
+            switchTab('leaders');
+            document.getElementById('union-filter').value = unionName;
+            syncPeopleWardVisibility();
+            document.getElementById('ward-filter').value = wardName;
+            updateDashboardStats();
+            renderPeopleList();
+        };
+
+        window.switchTab = function(tabName) {
+            const validTabs = ['dashboard', 'leaders', 'members', 'sudhi', 'attendance', 'finance'];
+            currentTab = validTabs.includes(tabName) ? tabName : 'dashboard';
+
+            if (!currentUser && (currentTab === 'sudhi' || currentTab === 'attendance' || currentTab === 'finance')) {
+                currentTab = 'dashboard';
+                openLoginModal();
+            }
+
+            validTabs.forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
                 if (!btn) return;
-                const isHidden = btn.classList.contains('hidden');
-                const badge = btn.querySelector('span[id^="badge-count"]');
-                if (t === tab) {
-                    btn.className = `${isHidden ? 'hidden ' : ''}w-full sm:flex-1 py-2.5 px-2 sm:px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-primary text-white shadow-sm`;
-                    if (badge) badge.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 text-white";
+                if (t === currentTab) {
+                    btn.className = "w-full sm:flex-1 py-2.5 px-2 sm:px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-primary text-white shadow-sm";
                 } else {
-                    btn.className = `${isHidden ? 'hidden ' : ''}w-full sm:flex-1 py-2.5 px-2 sm:px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-gray-600 hover:bg-gray-100`;
-                    if (badge) badge.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-700";
+                    btn.className = "w-full sm:flex-1 py-2.5 px-2 sm:px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-gray-600 hover:bg-gray-100";
                 }
             });
 
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-people').classList.add('hidden');
-            document.getElementById('view-attendance').classList.add('hidden');
-            document.getElementById('view-finance').classList.add('hidden');
+            const dashView = document.getElementById('view-dashboard');
+            const peopleView = document.getElementById('view-people');
+            const attView = document.getElementById('view-attendance');
+            const finView = document.getElementById('view-finance');
 
-            if (tab === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden');
+            dashView?.classList.add('hidden');
+            peopleView?.classList.add('hidden');
+            attView?.classList.add('hidden');
+            finView?.classList.add('hidden');
+
+            if (currentTab === 'dashboard') {
+                dashView?.classList.remove('hidden');
+                renderNoticeBanner();
                 renderPublicDashboard();
-            } else if (tab === 'finance') {
-                document.getElementById('view-finance').classList.remove('hidden');
-                renderFinance();
-            } else if (tab === 'attendance') {
-                document.getElementById('view-attendance').classList.remove('hidden');
-                loadAttendanceChecklist();
-                renderAttendanceHistory();
-            } else {
-                document.getElementById('view-people').classList.remove('hidden');
+            } else if (currentTab === 'leaders' || currentTab === 'members' || currentTab === 'sudhi') {
+                peopleView?.classList.remove('hidden');
+                syncPeopleWardVisibility();
+                updateDashboardStats();
                 renderPeopleList();
+            } else if (currentTab === 'attendance') {
+                attView?.classList.remove('hidden');
+                onAttUnionChange();
+                renderAttendanceHistory();
+            } else if (currentTab === 'finance') {
+                finView?.classList.remove('hidden');
+                renderFinance();
             }
         };
 
@@ -1983,22 +2359,24 @@ ${rankingLines}
             document.getElementById('blood-filter').value = bg;
             document.querySelectorAll('.blood-chip').forEach(chip => {
                 if (chip.dataset.bg === bg) {
-                    chip.classList.add('ring-2', 'ring-red-500', 'bg-red-600', 'text-white');
-                    chip.classList.remove('bg-red-50', 'text-red-700', 'bg-gray-100', 'text-gray-700');
+                    chip.className = "blood-chip px-2.5 py-1 rounded-lg text-xs font-bold transition shrink-0 ring-2 ring-red-500 bg-red-600 text-white";
                 } else {
-                    chip.classList.remove('ring-2', 'ring-red-500', 'bg-red-600', 'text-white');
-                    if (chip.dataset.bg === 'ALL') chip.classList.add('bg-gray-100', 'text-gray-700');
-                    else chip.classList.add('bg-red-50', 'text-red-700');
+                    chip.className = "blood-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 transition shrink-0";
                 }
             });
-            renderPeopleList();
+            if (currentTab !== 'leaders' && currentTab !== 'members' && currentTab !== 'sudhi') {
+                switchTab('leaders');
+            } else {
+                renderPeopleList();
+            }
         };
 
         window.renderPeopleList = function() {
             const grid = document.getElementById('people-grid');
             const emptyState = document.getElementById('empty-state');
             const search = document.getElementById('search-input').value.toLowerCase().trim();
-            const union = document.getElementById('union-filter').value;
+            const union = getActiveScopeUnion();
+            const ward = getActiveScopeWard();
             const blood = document.getElementById('blood-filter').value;
 
             const typeMap = { 'leaders': 'leader', 'members': 'member', 'sudhi': 'sudhi' };
@@ -2008,16 +2386,17 @@ ${rankingLines}
                 if (p.type !== targetType) return false;
                 if (targetType === 'sudhi') {
                     if (!currentUser) return false;
-                    if (currentUser.role === 'union' && !personMatchesUnion(p, currentUser.union)) return false;
+                    if (currentUser.role === 'union' && !personMatchesUnion(p, currentUser.union, 'ALL')) return false;
                 }
-                if (union !== 'ALL' && !personMatchesUnion(p, union)) return false;
+                if (!personMatchesUnion(p, union, ward)) return false;
                 if (blood !== 'ALL' && (p.bloodGroup || '') !== blood) return false;
                 if (search) {
                     const matchName = (p.name || '').toLowerCase().includes(search);
                     const matchDesig = (p.designation || '').toLowerCase().includes(search);
                     const matchPhone = (p.phone || '').includes(search);
+                    const matchWard = (p.ward || '').toLowerCase().includes(search);
                     const matchBlood = (p.bloodGroup || '').toLowerCase() === search;
-                    if (!matchName && !matchDesig && !matchPhone && !matchBlood) return false;
+                    if (!matchName && !matchDesig && !matchPhone && !matchWard && !matchBlood) return false;
                 }
                 return true;
             });
@@ -2047,6 +2426,9 @@ ${rankingLines}
                 const bloodBadge = person.bloodGroup
                     ? `<span class="text-[10px] font-extrabold text-red-700 bg-red-50 px-1.5 py-0.5 rounded-md border border-red-200">${person.bloodGroup}</span>`
                     : '';
+                const wardTag = (isUnionOrPourashava(person.union) && person.ward)
+                    ? `<span class="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded-md border border-amber-200 shrink-0">${person.ward}</span>`
+                    : '';
 
                 let accentColor = 'border-l-primary';
                 if (person.type === 'member') accentColor = 'border-l-amber-500';
@@ -2064,8 +2446,9 @@ ${rankingLines}
                             </div>
                             <p class="text-xs font-semibold text-primary truncate mt-0.5">${person.designation}</p>
                             <div class="flex items-center gap-1.5 mt-1 text-[11px] text-gray-500">
-                                <i class="fas fa-map-marker-alt text-amber-600 text-[10px]"></i>
+                                <i class="fas fa-map-marker-alt text-amber-600 text-[10px] shrink-0"></i>
                                 <span class="truncate font-medium">${person.union}</span>
+                                ${wardTag}
                             </div>
                         </div>
                     </div>
@@ -2100,7 +2483,7 @@ ${rankingLines}
 
             document.getElementById('detail-name').innerText = person.name;
             document.getElementById('detail-designation').innerText = person.designation;
-            document.getElementById('detail-union').innerText = person.union;
+            document.getElementById('detail-union').innerText = formatScopeLabel(person.union, person.ward);
             document.getElementById('detail-phone').innerText = person.phone;
 
             const typeLabels = { 'leader': 'দায়িত্বশীল', 'member': 'সাধারণ সদস্য', 'sudhi': 'সুধী / শুভাকাঙ্ক্ষী' };
@@ -2207,32 +2590,111 @@ ${rankingLines}
             sendQuickReminderWA(selectedPersonForModal.id);
         };
 
-        function populateDesignationOptions(type, selectedVal = '') {
+        function getDesignationsForScope(unionName, wardName) {
+            if (isUnionOrPourashava(unionName)) {
+                return wardName ? getWardDesignationList() : getUnionDesignationList();
+            }
+            return getUpazilaDesignationList();
+        }
+
+        function getScopeTierInfo(unionName, wardName) {
+            if (isUnionOrPourashava(unionName)) {
+                if (wardName) {
+                    return { count: 11, label: 'ওয়ার্ড কমিটি (১১ সদস্য)', list: getWardDesignationList() };
+                }
+                return { count: 17, label: 'ইউনিয়ন/পৌর কমিটি (১৭ সদস্য)', list: getUnionDesignationList() };
+            }
+            return { count: 21, label: 'উপজেলা কমিটি (২১ সদস্য)', list: getUpazilaDesignationList() };
+        }
+
+        function normalizeSlotBaseName(desig) {
+            return String(desig || '').replace(/\s*\([২৩23]\)\s*$/, '').trim();
+        }
+
+        function getSlotIndexFromDesignation(desig, serialOrder, slotList) {
+            const raw = String(desig || '').trim();
+            const exactIdx = slotList.indexOf(raw);
+            if (exactIdx !== -1) return exactIdx;
+
+            const base = normalizeSlotBaseName(raw);
+            const matchingIndices = [];
+            slotList.forEach((item, idx) => {
+                if (normalizeSlotBaseName(item) === base) matchingIndices.push(idx);
+            });
+            if (matchingIndices.length === 0) return -1;
+            const orderPos = Math.max(0, Math.min(matchingIndices.length - 1, Number(serialOrder || 1) - 1));
+            return matchingIndices[orderPos];
+        }
+
+        function getOccupiedSlotsMap(unionName, wardName, excludePersonId = '') {
+            const tier = getScopeTierInfo(unionName, wardName);
+            const occupied = new Map();
+            const scopeLeaders = peopleData
+                .filter(p => p.type === 'leader' && p.union === unionName && (p.ward || '') === (wardName || '') && p.id !== excludePersonId)
+                .sort((a, b) => compareLeadersByHierarchy(a, b));
+
+            scopeLeaders.forEach(leader => {
+                let slotIdx = getSlotIndexFromDesignation(leader.designation, leader.serialOrder, tier.list);
+                if (slotIdx !== -1 && occupied.has(slotIdx)) {
+                    const base = normalizeSlotBaseName(leader.designation);
+                    const nextFree = tier.list.findIndex((item, idx) => normalizeSlotBaseName(item) === base && !occupied.has(idx));
+                    if (nextFree !== -1) slotIdx = nextFree;
+                }
+                if (slotIdx !== -1 && !occupied.has(slotIdx)) {
+                    occupied.set(slotIdx, leader);
+                }
+            });
+            return occupied;
+        }
+
+        function populateDesignationOptions(type, selectedVal = '', unionName = '', wardName = '', excludePersonId = '', selectedSerialOrder = 1) {
             const sel = document.getElementById('person-designation-select');
             const customInput = document.getElementById('person-designation-custom');
+            const labelEl = document.getElementById('person-designation-label');
             sel.innerHTML = '';
 
             if (type === 'leader') {
-                const orderedDesignations = [...new Set([...DEFAULT_LEADER_DESIGNATIONS, ...LEADER_DESIGNATIONS])];
-                orderedDesignations.forEach(d => {
-                    sel.innerHTML += `<option value="${d}">${d}</option>`;
+                const tier = getScopeTierInfo(unionName, wardName);
+                if (labelEl) labelEl.innerText = `পদবি (${tier.label}) *`;
+
+                const occupiedMap = getOccupiedSlotsMap(unionName, wardName, excludePersonId);
+                let targetSlotIdx = -1;
+                if (selectedVal) {
+                    targetSlotIdx = getSlotIndexFromDesignation(selectedVal, selectedSerialOrder, tier.list);
+                }
+
+                tier.list.forEach((slotLabel, idx) => {
+                    const holder = occupiedMap.get(idx);
+                    const serialBn = toBengaliDigits(String(idx + 1).padStart(2, '0'));
+                    const statusTag = holder ? ` — ✓ ${holder.name} (পূরণকৃত)` : ' — [খালি আছে]';
+                    const opt = document.createElement('option');
+                    opt.value = slotLabel;
+                    opt.dataset.slotIndex = String(idx);
+                    opt.textContent = `${serialBn}. ${slotLabel}${statusTag}`;
+                    if (holder) opt.className = 'text-gray-500 bg-gray-100';
+                    sel.appendChild(opt);
                 });
-                sel.innerHTML += `<option value="__CUSTOM__">অন্যান্য (নিজে লিখুন)</option>`;
-                if (selectedVal && orderedDesignations.includes(selectedVal)) {
-                    sel.value = selectedVal;
+
+                if (targetSlotIdx !== -1) {
+                    sel.selectedIndex = targetSlotIdx;
                     customInput.classList.add('hidden');
                     customInput.required = false;
                 } else if (selectedVal) {
-                    sel.value = '__CUSTOM__';
-                    customInput.value = selectedVal;
-                    customInput.classList.remove('hidden');
-                    customInput.required = true;
+                    const legacyOpt = document.createElement('option');
+                    legacyOpt.value = selectedVal;
+                    legacyOpt.textContent = `★ ${selectedVal} (বর্তমান পদবি)`;
+                    sel.appendChild(legacyOpt);
+                    sel.value = selectedVal;
+                    customInput.classList.add('hidden');
+                    customInput.required = false;
                 } else {
-                    sel.value = LEADER_DESIGNATIONS[0];
+                    const firstVacantIdx = tier.list.findIndex((_, idx) => !occupiedMap.has(idx));
+                    sel.selectedIndex = firstVacantIdx !== -1 ? firstVacantIdx : 0;
                     customInput.classList.add('hidden');
                     customInput.required = false;
                 }
             } else if (type === 'member') {
+                if (labelEl) labelEl.innerText = 'পদবি / পরিচয় *';
                 sel.innerHTML = `<option value="সদস্য">সাধারণ সদস্য</option><option value="__CUSTOM__">অন্যান্য (পেশা লিখুন)</option>`;
                 if (selectedVal && selectedVal !== 'সদস্য') {
                     sel.value = '__CUSTOM__';
@@ -2245,6 +2707,7 @@ ${rankingLines}
                     customInput.required = false;
                 }
             } else {
+                if (labelEl) labelEl.innerText = 'পেশা / পরিচয় *';
                 sel.innerHTML = `<option value="সুধী">সুধী / শুভাকাঙ্ক্ষী</option><option value="ব্যবসায়ী">ব্যবসায়ী</option><option value="চাকরিজীবী">চাকরিজীবী</option><option value="শিক্ষক">শিক্ষক</option><option value="প্রবাসী">প্রবাসী</option><option value="__CUSTOM__">অন্যান্য (নিজে লিখুন)</option>`;
                 const opts = ['সুধী', 'ব্যবসায়ী', 'চাকরিজীবী', 'শিক্ষক', 'প্রবাসী'];
                 if (selectedVal && opts.includes(selectedVal)) {
@@ -2264,8 +2727,41 @@ ${rankingLines}
             }
         }
 
-        window.onPersonTypeChange = function() {
-            populateDesignationOptions(document.getElementById('person-type').value);
+        function updatePersonFormWardVisibility() {
+            const union = document.getElementById('person-union').value;
+            const wardBox = document.getElementById('person-ward-box');
+            const upzHintBox = document.getElementById('person-upazila-hint-box');
+            const wardSelect = document.getElementById('person-ward');
+            const hintEl = document.getElementById('person-form-template-hint');
+
+            if (isUnionOrPourashava(union)) {
+                wardBox.classList.remove('hidden');
+                if (upzHintBox) upzHintBox.classList.add('hidden');
+                const occupiedCount = getOccupiedSlotsMap(union, wardSelect.value, document.getElementById('person-id')?.value || '').size;
+                if (hintEl) {
+                    hintEl.innerText = wardSelect.value
+                        ? `${wardSelect.value} — অফিশিয়াল ১১ সদস্যের ওয়ার্ড কমিটি ফরম (পূরণকৃত: ${toBengaliDigits(occupiedCount)}/১১ জন)।`
+                        : `${union} — অফিশিয়াল ১৭ সদস্যের ইউনিয়ন/পৌর কমিটি ফরম (পূরণকৃত: ${toBengaliDigits(occupiedCount)}/১৭ জন)।`;
+                }
+            } else {
+                wardBox.classList.add('hidden');
+                wardSelect.value = '';
+                if (upzHintBox) {
+                    upzHintBox.classList.remove('hidden');
+                    const occupiedCount = getOccupiedSlotsMap(union, '', document.getElementById('person-id')?.value || '').size;
+                    upzHintBox.innerHTML = `<i class="fas fa-id-card-alt text-blue-700 shrink-0"></i><span>বাকেরগঞ্জ উপজেলা শাখা — অফিশিয়াল <b>২১ সদস্যের</b> কমিটি ফরম (পূরণকৃত: <b>${toBengaliDigits(occupiedCount)}/২১ জন</b>)।</span>`;
+                }
+            }
+        }
+
+        window.onPersonFormScopeChange = function() {
+            updatePersonFormWardVisibility();
+            const type = document.getElementById('person-type').value;
+            const union = document.getElementById('person-union').value;
+            const ward = isUnionOrPourashava(union) ? document.getElementById('person-ward').value : '';
+            const excludeId = document.getElementById('person-id')?.value || '';
+            const currentDesig = document.getElementById('person-designation-select').value;
+            populateDesignationOptions(type, excludeId ? (currentDesig === '__CUSTOM__' ? '' : currentDesig) : '', union, ward, excludeId);
         };
 
         window.onDesignationSelectChange = function() {
@@ -2287,21 +2783,26 @@ ${rankingLines}
             selectedPhotoBase64 = null;
             document.getElementById('person-form').reset();
             const unionSelect = document.getElementById('person-union');
+            const wardSelect = document.getElementById('person-ward');
 
             if (currentUser.role === 'union') {
                 unionSelect.value = currentUser.union;
                 unionSelect.disabled = true;
             } else {
                 unionSelect.disabled = false;
+                const activeFilterUnion = getActiveScopeUnion();
+                if (activeFilterUnion !== 'ALL') unionSelect.value = activeFilterUnion;
             }
 
             if (personToEdit) {
                 document.getElementById('person-form-title').innerText = "তথ্য সংশোধন (এডিট)";
                 document.getElementById('person-id').value = personToEdit.id;
                 document.getElementById('person-type').value = personToEdit.type;
-                document.getElementById('person-union').value = personToEdit.union;
+                unionSelect.value = personToEdit.union;
+                wardSelect.value = isUnionOrPourashava(personToEdit.union) ? (personToEdit.ward || '') : '';
+                updatePersonFormWardVisibility();
                 document.getElementById('person-name').value = personToEdit.name;
-                populateDesignationOptions(personToEdit.type, personToEdit.designation);
+                populateDesignationOptions(personToEdit.type, personToEdit.designation, personToEdit.union, wardSelect.value, personToEdit.id, personToEdit.serialOrder || 1);
                 document.getElementById('person-blood').value = personToEdit.bloodGroup || '';
                 document.getElementById('person-phone').value = personToEdit.phone;
                 document.getElementById('person-fixed-iyanat').value = personToEdit.fixedIyanat || '';
@@ -2313,7 +2814,15 @@ ${rankingLines}
                 const typeMap = { 'leaders': 'leader', 'members': 'member', 'sudhi': 'sudhi' };
                 const t = typeMap[currentTab] || 'leader';
                 document.getElementById('person-type').value = t;
-                populateDesignationOptions(t);
+
+                const activeWard = getActiveScopeWard();
+                if (isUnionOrPourashava(unionSelect.value) && activeWard !== 'ALL' && activeWard !== 'UNION_MAIN') {
+                    wardSelect.value = activeWard;
+                } else {
+                    wardSelect.value = '';
+                }
+                updatePersonFormWardVisibility();
+                populateDesignationOptions(t, '', unionSelect.value, wardSelect.value, '');
                 document.getElementById('person-serial-order').value = '';
                 document.getElementById('person-photo-preview').src = getAvatarDataUrl('ছ');
             }
@@ -2353,15 +2862,46 @@ ${rankingLines}
                 const id = document.getElementById('person-id').value;
                 const type = document.getElementById('person-type').value;
                 const union = currentUser.role === 'union' ? currentUser.union : document.getElementById('person-union').value;
+                const ward = isUnionOrPourashava(union) ? (document.getElementById('person-ward').value || '') : '';
                 const name = document.getElementById('person-name').value.trim();
-                const selDesig = document.getElementById('person-designation-select').value;
-                const designation = selDesig === '__CUSTOM__'
+                const selEl = document.getElementById('person-designation-select');
+                const selDesig = selEl.value;
+                let designation = selDesig === '__CUSTOM__'
                     ? document.getElementById('person-designation-custom').value.trim()
                     : selDesig;
                 const bloodGroup = document.getElementById('person-blood').value;
                 const phone = toEnglishDigits(document.getElementById('person-phone').value.trim());
                 const fixedIyanat = Number(document.getElementById('person-fixed-iyanat').value || 0);
-                const serialOrder = Number(document.getElementById('person-serial-order').value || 999);
+                let serialOrder = Number(document.getElementById('person-serial-order').value || 0);
+
+                if (type === 'leader') {
+                    const tier = getScopeTierInfo(union, ward);
+                    const occupiedMap = getOccupiedSlotsMap(union, ward, id);
+                    const chosenOpt = selEl.options[selEl.selectedIndex];
+                    const chosenSlotIdx = chosenOpt && chosenOpt.dataset.slotIndex !== undefined
+                        ? Number(chosenOpt.dataset.slotIndex)
+                        : getSlotIndexFromDesignation(designation, serialOrder || 1, tier.list);
+
+                    if (chosenSlotIdx !== -1 && occupiedMap.has(chosenSlotIdx)) {
+                        const existingHolder = occupiedMap.get(chosenSlotIdx);
+                        showToast(`"${tier.list[chosenSlotIdx]}" পদে ইতিমধ্যে ${existingHolder.name} আছেন! আগে তাকে এডিট করুন।`, 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> সংরক্ষণ করুন';
+                        return;
+                    }
+
+                    if (designation.endsWith('(২)')) {
+                        designation = normalizeSlotBaseName(designation);
+                        if (!serialOrder) serialOrder = 2;
+                    } else if (designation.endsWith('(৩)')) {
+                        designation = normalizeSlotBaseName(designation);
+                        if (!serialOrder) serialOrder = 3;
+                    } else if (!serialOrder) {
+                        serialOrder = 1;
+                    }
+                } else if (!serialOrder) {
+                    serialOrder = 999;
+                }
 
                 let photoUrl = id ? (peopleData.find(p => p.id === id)?.photo || '') : '';
                 if (selectedPhotoBase64) {
@@ -2369,7 +2909,7 @@ ${rankingLines}
                     if (uploadedUrl) photoUrl = uploadedUrl;
                 }
 
-                const payload = { type, union, name, designation, bloodGroup, phone, fixedIyanat, serialOrder, photo: photoUrl, updatedAt: new Date().toISOString() };
+                const payload = { type, union, ward, name, designation, bloodGroup, phone, fixedIyanat, serialOrder, photo: photoUrl, updatedAt: new Date().toISOString() };
                 if (isFirebaseReady && db) {
                     const existingObj = id ? peopleData.find(p => p.id === id) : null;
                     const isExistingInNewCol = id && !id.startsWith('upz_') && !id.startsWith('legacy_');
@@ -2380,7 +2920,7 @@ ${rankingLines}
                     }
                     if (existingObj && existingObj.legacyId) {
                         await updateDoc(doc(db, 'members', existingObj.legacyId), {
-                            name, designation, union, phone, bloodGroup, fixedIyanat, photoUrl
+                            name, designation, union, ward, phone, bloodGroup, fixedIyanat, photoUrl
                         }).catch(() => {});
                     }
                 } else {
@@ -2438,6 +2978,25 @@ ${rankingLines}
             });
         }
 
+        window.onAttUnionChange = function() {
+            const unionSelect = document.getElementById('att-union-select');
+            const wardBox = document.getElementById('att-ward-box');
+            const wardSelect = document.getElementById('att-ward-select');
+            if (currentUser && currentUser.role === 'union') {
+                unionSelect.value = currentUser.union;
+                unionSelect.disabled = true;
+            } else {
+                unionSelect.disabled = false;
+            }
+            if (isUnionOrPourashava(unionSelect.value)) {
+                wardBox.classList.remove('hidden');
+            } else {
+                wardBox.classList.add('hidden');
+                if (wardSelect) wardSelect.value = '';
+            }
+            loadAttendanceChecklist();
+        };
+
         window.loadAttendanceChecklist = function() {
             const unionSelect = document.getElementById('att-union-select');
             if (currentUser && currentUser.role === 'union') {
@@ -2447,11 +3006,16 @@ ${rankingLines}
                 unionSelect.disabled = false;
             }
             const selectedUnion = unionSelect.value;
+            const selectedWard = isUnionOrPourashava(selectedUnion)
+                ? (document.getElementById('att-ward-select')?.value || 'UNION_MAIN')
+                : 'ALL';
             const listEl = document.getElementById('att-checklist');
             listEl.innerHTML = '';
-            const leaders = peopleData.filter(p => p.type === 'leader' && personMatchesUnion(p, selectedUnion));
+            const leaders = peopleData
+                .filter(p => p.type === 'leader' && personMatchesUnion(p, selectedUnion, selectedWard))
+                .sort((a, b) => compareLeadersByHierarchy(a, b));
             if (leaders.length === 0) {
-                listEl.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 py-4">এই শাখায় কোনো দায়িত্বশীল যুক্ত নেই।</div>`;
+                listEl.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 py-4">এই শাখা বা ওয়ার্ডে কোনো দায়িত্বশীল যুক্ত নেই।</div>`;
                 return;
             }
 
@@ -2474,12 +3038,13 @@ ${rankingLines}
 
         window.saveAttendanceRecord = async function() {
             const union = currentUser && currentUser.role === 'union' ? currentUser.union : document.getElementById('att-union-select').value;
+            const ward = isUnionOrPourashava(union) ? (document.getElementById('att-ward-select')?.value || '') : '';
             const programName = document.getElementById('att-program-name').value.trim();
             const date = document.getElementById('att-date').value;
 
             if (!programName || !date) { showToast('প্রোগ্রামের নাম ও তারিখ লিখুন!', 'error'); return; }
             const checkboxes = Array.from(document.querySelectorAll('.att-checkbox'));
-            if (checkboxes.length === 0) { showToast('এই শাখায় কোনো দায়িত্বশীল নেই!', 'error'); return; }
+            if (checkboxes.length === 0) { showToast('এই শাখা বা ওয়ার্ডে কোনো দায়িত্বশীল নেই!', 'error'); return; }
 
             const presentList = [], absentList = [];
             checkboxes.forEach(cb => {
@@ -2489,7 +3054,7 @@ ${rankingLines}
             });
 
             const payload = {
-                union, programName, date,
+                union, ward, programName, date,
                 totalCount: checkboxes.length,
                 presentCount: presentList.length,
                 presentList, absentList,
@@ -2538,7 +3103,7 @@ ${rankingLines}
                                 <span class="font-bold text-sm text-gray-900">${att.programName}</span>
                                 <span class="text-[11px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">উপস্থিতি: ${toBengaliDigits(percent)}% (${toBengaliDigits(att.presentCount)}/${toBengaliDigits(att.totalCount)} জন)</span>
                             </div>
-                            <p class="text-[11px] text-gray-500 mt-0.5">${att.union} • তারিখ: ${toBengaliDigits(att.date)}</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5">${formatScopeLabel(att.union, att.ward)} • তারিখ: ${toBengaliDigits(att.date)}</p>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
                             <button onclick="copyAttendanceReport('${att.id}')" class="px-2.5 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm transition">
@@ -2560,11 +3125,12 @@ ${rankingLines}
         window.copyAttendanceReport = function(attId) {
             const att = attendanceData.find(a => a.id === attId);
             if (!att) return;
+            const scopeTitle = formatScopeLabel(att.union, att.ward);
             const percent = att.totalCount > 0 ? Math.round((att.presentCount / att.totalCount) * 100) : 0;
             const presentText = (att.presentList || []).map((p, i) => `${toBengaliDigits(i + 1)}. ${p.name} (${p.designation})`).join('\n') || 'নেই';
             const absentText = (att.absentList || []).map((p, i) => `${toBengaliDigits(i + 1)}. ${p.name} (${p.designation})`).join('\n') || 'কেউ অনুপস্থিত নন';
 
-            const reportText = `📋 *সাংগঠনিক প্রোগ্রাম হাজিরা প্রতিবেদন*\n*ইসলামী যুব আন্দোলন বাংলাদেশ — ${att.union}*\n\n📌 *প্রোগ্রাম:* ${att.programName}\n📅 *তারিখ:* ${toBengaliDigits(att.date)}\n📊 *মোট উপস্থিতি:* ${toBengaliDigits(att.presentCount)}/${toBengaliDigits(att.totalCount)} জন (*${toBengaliDigits(percent)}%*)\n\n✅ *উপস্থিত দায়িত্বশীলবৃন্দ:*\n${presentText}\n\n❌ *অনুপস্থিত দায়িত্বশীলবৃন্দ:*\n${absentText}\n\n— বায়তুলমাল ও দপ্তর বিভাগ, ${att.union}`;
+            const reportText = `📋 *সাংগঠনিক প্রোগ্রাম হাজিরা প্রতিবেদন*\n*ইসলামী যুব আন্দোলন বাংলাদেশ — ${scopeTitle}*\n\n📌 *প্রোগ্রাম:* ${att.programName}\n📅 *তারিখ:* ${toBengaliDigits(att.date)}\n📊 *মোট উপস্থিতি:* ${toBengaliDigits(att.presentCount)}/${toBengaliDigits(att.totalCount)} জন (*${toBengaliDigits(percent)}%*)\n\n✅ *উপস্থিত দায়িত্বশীলবৃন্দ:*\n${presentText}\n\n❌ *অনুপস্থিত দায়িত্বশীলবৃন্দ:*\n${absentText}\n\n— বায়তুলমাল ও দপ্তর বিভাগ, ${scopeTitle}`;
 
             navigator.clipboard?.writeText(reportText).catch(() => {
                 const ta = document.createElement('textarea');
@@ -2586,6 +3152,33 @@ ${rankingLines}
                 } catch (e) { showToast('মুছতে সমস্যা হয়েছে!', 'error'); }
             });
         };
+
+        function syncFinanceWardVisibility() {
+            const union = document.getElementById('finance-union-filter').value;
+            const wrapper = document.getElementById('finance-ward-wrapper');
+            const wardSelect = document.getElementById('finance-ward-filter');
+            if (!wrapper || !wardSelect) return;
+
+            if (isUnionOrPourashava(union)) {
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+                wardSelect.value = 'ALL';
+            }
+        }
+
+        window.onFinanceUnionChange = function() {
+            const wardSelect = document.getElementById('finance-ward-filter');
+            if (wardSelect) wardSelect.value = 'ALL';
+            syncFinanceWardVisibility();
+            renderFinance();
+        };
+
+        function getActiveFinanceWard() {
+            const union = document.getElementById('finance-union-filter').value;
+            if (!isUnionOrPourashava(union)) return 'ALL';
+            return document.getElementById('finance-ward-filter')?.value || 'ALL';
+        }
 
         window.switchFinanceSubTab = function(subTab) {
             currentFinSubTab = subTab;
@@ -2618,9 +3211,11 @@ ${rankingLines}
             } else {
                 filterSelect.disabled = false;
             }
+            syncFinanceWardVisibility();
 
             const selectedUnion = filterSelect.value;
-            const filtered = financeData.filter(f => selectedUnion === 'ALL' || f.union === selectedUnion);
+            const selectedWard = getActiveFinanceWard();
+            const filtered = financeData.filter(f => matchesUnionAndWard(f.union, f.ward || '', selectedUnion, selectedWard));
 
             let totalIncome = 0, totalExpense = 0;
             filtered.forEach(f => {
@@ -2638,6 +3233,7 @@ ${rankingLines}
 
         window.renderCollectionSheet = function() {
             const selectedUnion = document.getElementById('finance-union-filter').value;
+            const selectedWard = getActiveFinanceWard();
             const month = document.getElementById('col-month').value;
             const year = document.getElementById('col-year').value;
             const pType = document.getElementById('col-type').value;
@@ -2646,7 +3242,7 @@ ${rankingLines}
 
             let list = peopleData.filter(p => {
                 if (p.type !== pType) return false;
-                if (selectedUnion !== 'ALL' && !personMatchesUnion(p, selectedUnion)) return false;
+                if (!personMatchesUnion(p, selectedUnion, selectedWard)) return false;
                 if (colSearch) {
                     const matchName = (p.name || '').toLowerCase().includes(colSearch);
                     const matchDesig = (p.designation || '').toLowerCase().includes(colSearch);
@@ -2718,7 +3314,7 @@ ${rankingLines}
                 row.innerHTML = `
                     <div onclick="openPersonDetail('${person.id}')" class="min-w-0 flex-1 cursor-pointer">
                         <div class="font-bold text-xs sm:text-sm text-gray-900 truncate">${person.name}</div>
-                        <div class="text-[11px] text-gray-500 truncate">${person.designation} • ${selectedUnion !== 'ALL' ? selectedUnion : person.union}${fixedAmt > 0 ? ' • নির্ধারিত: ৳' + toBengaliDigits(fixedAmt) : ''}</div>
+                        <div class="text-[11px] text-gray-500 truncate">${person.designation} • ${formatScopeLabel(person.union, person.ward)}${fixedAmt > 0 ? ' • নির্ধারিত: ৳' + toBengaliDigits(fixedAmt) : ''}</div>
                     </div>
                     ${actionHtml}
                 `;
@@ -2739,10 +3335,11 @@ ${rankingLines}
 
         window.renderFinanceLedger = function() {
             const selectedUnion = document.getElementById('finance-union-filter').value;
+            const selectedWard = getActiveFinanceWard();
             const monthFilter = document.getElementById('ledger-month-filter').value;
 
             const filtered = financeData.filter(f => {
-                if (selectedUnion !== 'ALL' && f.union !== selectedUnion) return false;
+                if (!matchesUnionAndWard(f.union, f.ward || '', selectedUnion, selectedWard)) return false;
                 if (currentLedgerFilter !== 'ALL' && f.type !== currentLedgerFilter) return false;
                 if (monthFilter !== 'ALL') {
                     const txMonth = normalizeMonthName(f.month, f.date);
@@ -2772,7 +3369,7 @@ ${rankingLines}
                         </div>
                         <div class="min-w-0">
                             <div class="font-bold text-gray-900 text-xs sm:text-sm truncate">${tx.personName ? `${tx.personName} (${tx.month || ''} - ${tx.category})` : (tx.note || tx.category)}</div>
-                            <div class="text-[11px] text-gray-500 truncate">${tx.union} • ${toBengaliDigits(tx.date || '')}${tx.personName && tx.note ? ' • ' + tx.note : ''}</div>
+                            <div class="text-[11px] text-gray-500 truncate">${formatScopeLabel(tx.union, tx.ward)} • ${toBengaliDigits(tx.date || '')}${tx.personName && tx.note ? ' • ' + tx.note : ''}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
@@ -2826,6 +3423,7 @@ ${rankingLines}
                 const payload = {
                     type: 'income',
                     union: person.union,
+                    ward: person.ward || '',
                     category,
                     personId: person.id,
                     personName: person.name,
@@ -2856,10 +3454,11 @@ ${rankingLines}
         window.sendQuickReminderWA = function(personId) {
             const person = peopleData.find(p => p.id === personId);
             if (!person || !canManageUnion(person.union)) return;
+            const scopeTitle = formatScopeLabel(person.union, person.ward);
             const month = document.getElementById('col-month')?.value || MONTHS_BN[new Date().getMonth()];
             const year = document.getElementById('col-year')?.value || String(new Date().getFullYear());
             const amtText = Number(person.fixedIyanat) > 0 ? ` (নির্ধারিত: ৳${toBengaliDigits(person.fixedIyanat)})` : '';
-            const msg = `আসসালামু আলাইকুম ভাই ${person.name},\nইসলামী যুব আন্দোলন বাংলাদেশ, ${person.union}-এর ${toBengaliDigits(year)} সালের *${month}* মাসের ইয়ানত${amtText} এখনো বকেয়া রয়েছে। অনুগ্রহ করে সুবিধামতো সময়ে পরিশোধ করার জন্য অনুরোধ করছি।\n\nজাযাকাল্লাহু খাইরান।\n— বায়তুলমাল বিভাগ, ${person.union}`;
+            const msg = `আসসালামু আলাইকুম ভাই ${person.name},\nইসলামী যুব আন্দোলন বাংলাদেশ, ${scopeTitle}-এর ${toBengaliDigits(year)} সালের *${month}* মাসের ইয়ানত${amtText} এখনো বকেয়া রয়েছে। অনুগ্রহ করে সুবিধামতো সময়ে পরিশোধ করার জন্য অনুরোধ করছি।\n\nজাযাকাল্লাহু খাইরান।\n— বায়তুলমাল বিভাগ, ${scopeTitle}`;
             const cleanPhone = normalizePhone(person.phone);
             const waNumber = cleanPhone.startsWith('88') ? cleanPhone : '88' + cleanPhone;
             window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -2879,10 +3478,25 @@ ${rankingLines}
             }
         };
 
+        window.onFinUnionChange = function() {
+            const finUnionSelect = document.getElementById('fin-union');
+            const finWardBox = document.getElementById('fin-ward-box');
+            const finWardSelect = document.getElementById('fin-ward');
+            const union = currentUser && currentUser.role === 'union' ? currentUser.union : finUnionSelect.value;
+            if (isUnionOrPourashava(union)) {
+                finWardBox.classList.remove('hidden');
+            } else {
+                finWardBox.classList.add('hidden');
+                if (finWardSelect) finWardSelect.value = '';
+            }
+            populateMemberDropdownForIyanat();
+        };
+
         window.openFinanceModal = function(txToEdit = null, prefillPerson = null) {
             if (!currentUser) return;
             document.getElementById('finance-form').reset();
             const finUnionSelect = document.getElementById('fin-union');
+            const finWardSelect = document.getElementById('fin-ward');
 
             if (currentUser.role === 'union') {
                 finUnionSelect.value = currentUser.union;
@@ -2896,6 +3510,8 @@ ${rankingLines}
                 document.getElementById('fin-tx-id').value = txToEdit.id;
                 setTxType(txToEdit.type);
                 if (currentUser.role === 'super') finUnionSelect.value = txToEdit.union;
+                onFinUnionChange();
+                if (finWardSelect) finWardSelect.value = txToEdit.ward || '';
                 if (txToEdit.type === 'income') {
                     document.getElementById('fin-category').value = txToEdit.category || 'মাসিক ইয়ানত';
                     toggleIyanatFields();
@@ -2912,11 +3528,18 @@ ${rankingLines}
 
                 if (prefillPerson && canManageUnion(prefillPerson.union)) {
                     finUnionSelect.value = prefillPerson.union;
+                    onFinUnionChange();
+                    if (finWardSelect) finWardSelect.value = prefillPerson.ward || '';
                     document.getElementById('fin-category').value = prefillPerson.type === 'sudhi' ? 'সুধী ইয়ানত' : 'মাসিক ইয়ানত';
                     toggleIyanatFields();
                     document.getElementById('fin-person-id').value = prefillPerson.id;
                     autoFillFixedIyanat();
                 } else {
+                    const activeWard = getActiveFinanceWard();
+                    onFinUnionChange();
+                    if (finWardSelect && activeWard !== 'ALL' && activeWard !== 'UNION_MAIN') {
+                        finWardSelect.value = activeWard;
+                    }
                     toggleIyanatFields();
                 }
             }
@@ -2960,19 +3583,21 @@ ${rankingLines}
 
         window.populateMemberDropdownForIyanat = function() {
             const selectedUnion = currentUser && currentUser.role === 'union' ? currentUser.union : document.getElementById('fin-union').value;
+            const selectedWard = isUnionOrPourashava(selectedUnion) ? (document.getElementById('fin-ward')?.value || 'ALL') : 'ALL';
             const cat = document.getElementById('fin-category').value;
             const select = document.getElementById('fin-person-id');
             select.innerHTML = '<option value="">-- নাম সিলেক্ট করুন --</option>';
 
             const filtered = peopleData.filter(p => {
-                if (!personMatchesUnion(p, selectedUnion)) return false;
+                if (!personMatchesUnion(p, selectedUnion, selectedWard || 'ALL')) return false;
                 if (cat === 'সুধী ইয়ানত') return p.type === 'sudhi';
                 return p.type === 'leader' || p.type === 'member';
             });
 
             filtered.forEach(p => {
                 const fixedInfo = Number(p.fixedIyanat) > 0 ? ` — নির্ধারিত: ৳${toBengaliDigits(p.fixedIyanat)}` : '';
-                select.innerHTML += `<option value="${p.id}">${p.name} (${p.designation}${fixedInfo})</option>`;
+                const wardInfo = p.ward ? ` [${p.ward}]` : '';
+                select.innerHTML += `<option value="${p.id}">${p.name} (${p.designation}${wardInfo}${fixedInfo})</option>`;
             });
         };
 
@@ -2989,7 +3614,8 @@ ${rankingLines}
 
         function showReceiptPrompt(personObj, payload) {
             if (personObj && personObj.phone) {
-                const msg = `আসসালামু আলাইকুম মুহতারাম ${personObj.name},\nইসলামী যুব আন্দোলন বাংলাদেশ, ${payload.union}-এর বায়তুলমালে আপনার ${toBengaliDigits(payload.year)} সালের *${payload.month}* মাসের ${payload.category} বাবদ *৳${toBengaliDigits(payload.amount)}* সফলভাবে গৃহীত হয়েছে।\n\nজাযাকাল্লাহু খাইরান।\n— বায়তুলমাল বিভাগ, ${payload.union}`;
+                const scopeTitle = formatScopeLabel(payload.union, payload.ward);
+                const msg = `আসসালামু আলাইকুম মুহতারাম ${personObj.name},\nইসলামী যুব আন্দোলন বাংলাদেশ, ${scopeTitle}-এর বায়তুলমালে আপনার ${toBengaliDigits(payload.year)} সালের *${payload.month}* মাসের ${payload.category} বাবদ *৳${toBengaliDigits(payload.amount)}* সফলভাবে গৃহীত হয়েছে।\n\nজাযাকাল্লাহু খাইরান।\n— বায়তুলমাল বিভাগ, ${scopeTitle}`;
                 const cleanPhone = normalizePhone(personObj.phone);
                 const waNumber = cleanPhone.startsWith('88') ? cleanPhone : '88' + cleanPhone;
                 document.getElementById('receipt-summary-text').innerText = `${personObj.name}-এর হোয়াটসঅ্যাপে ৳${toBengaliDigits(payload.amount)} জমার ডিজিটাল রসিদ পাঠাতে চান?`;
@@ -3009,11 +3635,12 @@ ${rankingLines}
                 const txId = document.getElementById('fin-tx-id').value;
                 const type = document.getElementById('fin-type').value;
                 const union = currentUser.role === 'union' ? currentUser.union : document.getElementById('fin-union').value;
+                let ward = isUnionOrPourashava(union) ? (document.getElementById('fin-ward')?.value || '') : '';
                 const amount = Number(document.getElementById('fin-amount').value);
                 const note = document.getElementById('fin-note').value.trim();
 
                 let payload = {
-                    type, union, amount, note,
+                    type, union, ward, amount, note,
                     date: txId ? (financeData.find(f => f.id === txId)?.date || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
                     createdAt: new Date().toISOString()
                 };
@@ -3032,6 +3659,7 @@ ${rankingLines}
                         personObj = peopleData.find(p => p.id === personId);
                         payload.personId = personId;
                         payload.personName = personObj ? personObj.name : '';
+                        if (personObj && personObj.ward) payload.ward = personObj.ward;
                         payload.month = document.getElementById('fin-month').value;
                         payload.year = document.getElementById('fin-year').value;
                     }
@@ -3088,9 +3716,24 @@ ${rankingLines}
             });
         };
 
+        window.onReportUnionChange = function() {
+            const union = document.getElementById('report-union-select').value;
+            const wardBox = document.getElementById('report-ward-box');
+            const wardSelect = document.getElementById('report-ward-select');
+            if (isUnionOrPourashava(union)) {
+                wardBox.classList.remove('hidden');
+            } else {
+                wardBox.classList.add('hidden');
+                if (wardSelect) wardSelect.value = 'ALL';
+            }
+            generatePrintableReport();
+        };
+
         window.openPrintReportModal = function() {
             const reportUnionSelect = document.getElementById('report-union-select');
+            const reportWardSelect = document.getElementById('report-ward-select');
             const currentFilter = document.getElementById('finance-union-filter').value;
+            const currentWard = getActiveFinanceWard();
             if (currentUser && currentUser.role === 'union') {
                 reportUnionSelect.value = currentUser.union;
                 reportUnionSelect.disabled = true;
@@ -3098,23 +3741,31 @@ ${rankingLines}
                 reportUnionSelect.disabled = false;
                 reportUnionSelect.value = currentFilter;
             }
+            onReportUnionChange();
+            if (reportWardSelect && isUnionOrPourashava(reportUnionSelect.value)) {
+                reportWardSelect.value = currentWard;
+            }
             generatePrintableReport();
             document.getElementById('print-report-modal').classList.remove('hidden');
         };
 
         window.generatePrintableReport = function() {
             const union = document.getElementById('report-union-select').value;
+            const ward = isUnionOrPourashava(union) ? (document.getElementById('report-ward-select')?.value || 'ALL') : 'ALL';
             const selectedMonth = document.getElementById('report-month-select').value;
             const year = document.getElementById('report-year-select').value;
             const personType = document.getElementById('report-person-type').value;
             const area = document.getElementById('print-report-area');
 
-            const unionTitle = union === 'ALL' ? 'সকল শাখা (উপজেলা ও ইউনিয়ন সমন্বিত)' : union;
+            let unionTitle = union === 'ALL' ? 'সকল শাখা (উপজেলা ও ইউনিয়ন সমন্বিত)' : union;
+            if (isUnionOrPourashava(union) && ward !== 'ALL') {
+                unionTitle += ward === 'UNION_MAIN' ? ' — ইউনিয়ন/পৌর মূল কমিটি' : ` — ${ward}`;
+            }
             const periodTitle = selectedMonth === 'ALL' ? `বাৎসরিক প্রতিবেদন — ${toBengaliDigits(year)} ইংরেজি` : `মাসিক প্রতিবেদন — ${selectedMonth}, ${toBengaliDigits(year)} ইংরেজি`;
             const todayStr = new Date().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
 
             const txs = financeData.filter(f => {
-                if (union !== 'ALL' && f.union !== union) return false;
+                if (!matchesUnionAndWard(f.union, f.ward || '', union, ward)) return false;
                 const txYear = f.year ? String(f.year) : (f.date ? f.date.split('-')[0] : year);
                 if (txYear !== year) return false;
                 if (selectedMonth !== 'ALL') {
@@ -3137,7 +3788,7 @@ ${rankingLines}
             const balance = totalIncome - totalExpense;
 
             const peopleForReport = peopleData.filter(p => {
-                if (union !== 'ALL' && p.union !== union) return false;
+                if (!personMatchesUnion(p, union, ward)) return false;
                 if (personType !== 'ALL' && p.type !== personType) return false;
                 return true;
             });
@@ -3168,7 +3819,7 @@ ${rankingLines}
                         <td class="text-center font-semibold">${toBengaliDigits(idx + 1)}</td>
                         <td>
                             <div class="font-bold text-gray-900">${p.name}</div>
-                            <div class="text-[10px] text-gray-600">${p.designation}${union === 'ALL' ? ' • ' + p.union : ''}</div>
+                            <div class="text-[10px] text-gray-600">${p.designation} • ${formatScopeLabel(p.union, p.ward)}</div>
                         </td>
                         <td class="text-center font-semibold">${fixedRate > 0 ? '৳ ' + toBengaliDigits(fixedRate.toLocaleString()) : '-'}</td>
                         <td class="text-[11px] text-gray-800">${paidMonths.length > 0 ? paidMonths.join(', ') : '<span class="text-gray-400">পরিশোধ হয়নি</span>'}</td>
@@ -3455,6 +4106,7 @@ ${rankingLines}
             currentUser = null;
             clearSessionUser();
             document.getElementById('union-filter').value = 'ALL';
+            syncPeopleWardVisibility();
             updateUIForAdmin(false);
             switchTab('dashboard');
             showToast('লগআউট সম্পন্ন হয়েছে।', 'info');
@@ -3482,17 +4134,18 @@ ${rankingLines}
                 fabAdd.classList.remove('hidden');
 
                 if (currentUser.role === 'super') {
-                    document.getElementById('admin-role-text').innerText = `${currentUser.name} (সকল শাখা নিয়ন্ত্রণ)`;
+                    document.getElementById('admin-role-text').innerText = `${currentUser.name} (সকল শাখা ও ওয়ার্ড নিয়ন্ত্রণ)`;
                     btnSuperSettings.classList.remove('hidden');
                     btnNoticeOpen.classList.remove('hidden');
                     btnBannerNotice.classList.remove('hidden');
                 } else {
-                    document.getElementById('admin-role-text').innerText = `${currentUser.name} (${currentUser.union} অ্যাডমিন)`;
+                    document.getElementById('admin-role-text').innerText = `${currentUser.name} (${currentUser.union} ও সব ওয়ার্ড)`;
                     btnSuperSettings.classList.add('hidden');
                     btnNoticeOpen.classList.remove('hidden');
                     btnBannerNotice.classList.remove('hidden');
                     if (justLoggedIn) {
                         document.getElementById('union-filter').value = currentUser.union;
+                        syncPeopleWardVisibility();
                     }
                 }
             } else {
@@ -3551,9 +4204,9 @@ ${rankingLines}
             const container = document.getElementById('secretary-diagnostic-list');
             if (!container) return;
             container.innerHTML = UNIONS.map(u => {
-                const leaders = peopleData.filter(p => p.union === u && p.type === 'leader');
-                const gs = leaders.find(l => getLeaderDesignationRank(l.designation) === 3);
-                const misplacedGs = !gs ? peopleData.find(p => p.union === u && p.type !== 'leader' && (String(p.designation || '').includes('সাধারণ') || String(p.designation || '').includes('সেক্রেটার'))) : null;
+                const leaders = peopleData.filter(p => p.union === u && !p.ward && p.type === 'leader');
+                const gs = leaders.find(l => getLeaderDesignationRank(l.designation, u, '') === 3);
+                const misplacedGs = !gs ? peopleData.find(p => p.union === u && !p.ward && p.type !== 'leader' && (String(p.designation || '').includes('সাধারণ') || String(p.designation || '').includes('সেক্রেটার'))) : null;
 
                 if (gs) {
                     return `<div class="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-emerald-200 text-[11px]">
@@ -3586,6 +4239,7 @@ ${rankingLines}
                         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ijab_people'), {
                             type: 'leader',
                             union: person.union,
+                            ward: person.ward || '',
                             name: person.name,
                             designation: 'সাধারণ সম্পাদক',
                             phone: person.phone,
@@ -3724,8 +4378,8 @@ ${rankingLines}
         };
 
         window.exportPeopleCSV = function() {
-            const rows = [['ধরণ', 'নাম', 'পদবি', 'শাখা', 'মোবাইল', 'রক্তের গ্রুপ', 'নির্ধারিত ইয়ানত']];
-            peopleData.forEach(p => rows.push([p.type, p.name, p.designation, p.union, p.phone, p.bloodGroup || '', p.fixedIyanat || 0]));
+            const rows = [['ধরণ', 'নাম', 'পদবি', 'শাখা', 'ওয়ার্ড', 'মোবাইল', 'রক্তের গ্রুপ', 'নির্ধারিত ইয়ানত']];
+            peopleData.forEach(p => rows.push([p.type, p.name, p.designation, p.union, p.ward || 'মূল কমিটি', p.phone, p.bloodGroup || '', p.fixedIyanat || 0]));
             const csv = '\uFEFF' + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
